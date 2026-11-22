@@ -72,7 +72,7 @@ class NoSearchResultsView extends StatelessWidget {
                     fit: BoxFit.contain,
                     color: AppColors.surface,
                     colorBlendMode: BlendMode.multiply,
-                    errorBuilder: (_, __, ___) => const Icon(
+                    errorBuilder: (_, _, _) => const Icon(
                       Icons.search_off_rounded,
                       size: 64,
                       color: AppColors.blue,

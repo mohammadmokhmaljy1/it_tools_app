@@ -43,12 +43,12 @@ class GuestCheckoutGateSheet extends StatelessWidget {
                 width: 64,
                 height: 64,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => Image.asset(
+                errorBuilder: (_, _, _) => Image.asset(
                   'assets/images/logo.png',
                   width: 64,
                   height: 64,
                   fit: BoxFit.cover,
-                  errorBuilder: (_, __, ___) => Container(
+                  errorBuilder: (_, _, _) => Container(
                     width: 64,
                     height: 64,
                     decoration: BoxDecoration(
@@ -109,12 +109,12 @@ class GuestCheckoutGateSheet extends StatelessWidget {
                       width: 22,
                       height: 22,
                       fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => Image.asset(
+                      errorBuilder: (_, _, _) => Image.asset(
                         'assets/images/google_icon.png',
                         width: 22,
                         height: 22,
                         fit: BoxFit.contain,
-                        errorBuilder: (_, __, ___) => const Text(
+                        errorBuilder: (_, _, _) => const Text(
                           'G',
                           style: TextStyle(
                             fontSize: 20,

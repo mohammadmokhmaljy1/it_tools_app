@@ -34,7 +34,7 @@ class OrderSuccessPage extends StatelessWidget {
                   fit: BoxFit.contain,
                   color: AppColors.surface,
                   colorBlendMode: BlendMode.multiply,
-                  errorBuilder: (_, __, ___) => const Icon(
+                  errorBuilder: (_, _, _) => const Icon(
                     Icons.check_circle_rounded,
                     size: 90,
                     color: AppColors.blue,

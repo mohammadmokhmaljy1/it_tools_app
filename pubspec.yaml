@@ -59,10 +59,8 @@ flutter:
     - assets/images/logo/
     - assets/images/onboarding/
     - assets/images/banners/
-    - assets/images/placeholders/
     - assets/images/products/
     - assets/icons/
-    - assets/animations/
     - assets/images/empty_states/
   
   

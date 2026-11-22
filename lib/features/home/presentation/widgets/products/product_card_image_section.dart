@@ -33,7 +33,7 @@ class ProductCardImageSection extends StatelessWidget {
               child: Image.asset(
                 imageUrl,
                 fit: BoxFit.cover,
-                errorBuilder: (_, __, ___) => const Center(
+                errorBuilder: (_, _, _) => const Center(
                   child: Icon(
                     Icons.image_not_supported_outlined,
                     color: AppColors.textTertiary,
