@@ -12,9 +12,10 @@ class ITToolsApp extends StatelessWidget {
       title: 'المحيط - إكسسوارات الكمبيوتر',
       debugShowCheckedModeBanner: false,
 
-      // ربط الثيم
+      // ربط الثيم (الفاتح والداكن)
       theme: AppTheme.lightTheme,
-      themeMode: ThemeMode.light,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
 
       // دعم اللغة العربية (RTL)
       locale: const Locale('ar', 'AE'),

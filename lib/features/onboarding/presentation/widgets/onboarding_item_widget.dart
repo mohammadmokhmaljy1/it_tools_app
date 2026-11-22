@@ -17,43 +17,46 @@ class OnboardingItemWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // صورة الترحيب ثلاثية الأبعاد
-          SizedBox(
-            height: 280,
-            child: Image.asset(
-              imagePath,
-              fit: BoxFit.contain,
-              color: AppColors.surface,
-              colorBlendMode: BlendMode.multiply,
+    return Center(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // صورة الترحيب ثلاثية الأبعاد
+            SizedBox(
+              height: 280,
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.contain,
+                color: AppColors.surface,
+                colorBlendMode: BlendMode.multiply,
+              ),
             ),
-          ),
-          const SizedBox(height: 40),
-          // عنوان الصفحة الرئيسي
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: AppTextStyles.headingH1.copyWith(
-              color: AppColors.textPrimary,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+            const SizedBox(height: 40),
+            // عنوان الصفحة الرئيسي
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.headingH1.copyWith(
+                color: AppColors.textPrimary,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          // وصف الصفحة الفرعي
-          Text(
-            description,
-            textAlign: TextAlign.center,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
-              height: 1.5,
+            const SizedBox(height: 16),
+            // وصف الصفحة الفرعي
+            Text(
+              description,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.textSecondary,
+                height: 1.5,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
