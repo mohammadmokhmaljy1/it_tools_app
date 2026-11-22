@@ -126,8 +126,17 @@ class _CategoriesPageState extends State<CategoriesPage> {
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 1,
         onTap: (index) {
-          if (index == 0) context.go(AppRouter.home);
-          if (index == 3) context.go(AppRouter.favorites);
+          if (index == 0) {
+            context.go(AppRouter.home);
+          } else if (index == 1) {
+            context.go(AppRouter.categories);
+          } else if (index == 2) {
+            context.go(AppRouter.cart);
+          } else if (index == 3) {
+            context.go(AppRouter.favorites);
+          } else if (index == 4) {
+            context.go(AppRouter.profile);
+          }
         },
       ),
     );

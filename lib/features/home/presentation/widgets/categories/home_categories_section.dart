@@ -1,4 +1,8 @@
+// ignore_for_file: unused_label
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:it_tools_app/core/config/app_router.dart';
 
 import 'package:it_tools_app/core/constants/app_assets.dart';
 import 'package:it_tools_app/core/theme/app_colors.dart';
@@ -43,8 +47,9 @@ class HomeCategoriesSection extends StatelessWidget {
               ),
               TextButton(
                 onPressed: () {
-                  // TODO: الانتقال لصفحة جميع الأقسام
+                  context.go(AppRouter.categories);
                 },
+
                 style: TextButton.styleFrom(
                   padding: EdgeInsets.zero,
                   minimumSize: Size.zero,
@@ -84,8 +89,12 @@ class HomeCategoriesSection extends StatelessWidget {
                 final category = categories[index];
                 return GestureDetector(
                   onTap: () {
-                    // TODO: الانتقال لصفحة منتجات القسم
+                    context.push(
+                      AppRouter.productList,
+                      extra: category['title'] as String,
+                    );
                   },
+
                   child: Column(
                     children: [
                       Container(

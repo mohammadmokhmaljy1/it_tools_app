@@ -5,8 +5,8 @@ import 'package:it_tools_app/core/theme/app_colors.dart';
 import 'package:it_tools_app/core/theme/app_text_styles.dart';
 import 'package:it_tools_app/core/widgets/custom_bottom_nav_bar.dart';
 import 'package:it_tools_app/features/categories/presentation/widgets/product_list/product_grid_card.dart';
-import 'package:it_tools_app/features/favorites/presentation/widgets/empty_favorites_view.dart';
-import 'package:it_tools_app/features/favorites/presentation/widgets/favorites_mock_data.dart';
+import 'package:it_tools_app/features/favorites/presentation/widgets/favorites/empty_favorites_view.dart';
+import 'package:it_tools_app/features/favorites/presentation/widgets/favorites/favorites_mock_data.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -97,8 +97,17 @@ class _FavoritesPageState extends State<FavoritesPage> {
       bottomNavigationBar: CustomBottomNavBar(
         currentIndex: 3,
         onTap: (index) {
-          if (index == 0) context.go(AppRouter.home);
-          if (index == 1) context.go(AppRouter.categories);
+          if (index == 0) {
+            // نحن أساساً في الهوم
+          } else if (index == 1) {
+            context.go(AppRouter.categories);
+          } else if (index == 2) {
+            context.go(AppRouter.cart);
+          } else if (index == 3) {
+            context.go(AppRouter.favorites);
+          } else if (index == 4) {
+            context.go(AppRouter.profile);
+          }
         },
       ),
     );

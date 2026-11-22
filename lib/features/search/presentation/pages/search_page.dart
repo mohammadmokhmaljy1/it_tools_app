@@ -3,7 +3,7 @@ import 'package:it_tools_app/core/theme/app_colors.dart';
 import 'package:it_tools_app/core/theme/app_text_styles.dart';
 import 'package:it_tools_app/features/categories/presentation/widgets/product_list/product_grid_card.dart';
 import 'package:it_tools_app/features/categories/presentation/widgets/product_list/product_list_mock_data.dart';
-import 'package:it_tools_app/features/favorites/presentation/widgets/favorites_mock_data.dart';
+import 'package:it_tools_app/features/favorites/presentation/widgets/favorites/favorites_mock_data.dart';
 import 'package:it_tools_app/features/search/presentation/widgets/filter/filter_bottom_sheet.dart';
 import 'package:it_tools_app/features/search/presentation/widgets/search/no_search_results_view.dart';
 import 'package:it_tools_app/features/search/presentation/widgets/search/recent_searches_section.dart';

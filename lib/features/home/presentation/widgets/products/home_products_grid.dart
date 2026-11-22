@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:it_tools_app/features/favorites/presentation/widgets/favorites_mock_data.dart';
+import 'package:it_tools_app/features/favorites/presentation/widgets/favorites/favorites_mock_data.dart';
 import 'package:it_tools_app/features/home/presentation/widgets/products/product_card.dart';
 
 class HomeProductsGrid extends StatefulWidget {

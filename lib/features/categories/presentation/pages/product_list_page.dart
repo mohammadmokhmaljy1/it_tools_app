@@ -4,7 +4,7 @@ import 'package:it_tools_app/features/search/presentation/widgets/filter/filter_
 import 'package:it_tools_app/features/categories/presentation/widgets/product_list/product_grid_card.dart';
 import 'package:it_tools_app/features/categories/presentation/widgets/product_list/product_list_header.dart';
 import 'package:it_tools_app/features/categories/presentation/widgets/product_list/product_list_mock_data.dart';
-import 'package:it_tools_app/features/favorites/presentation/widgets/favorites_mock_data.dart';
+import 'package:it_tools_app/features/favorites/presentation/widgets/favorites/favorites_mock_data.dart';
 
 class ProductListPage extends StatefulWidget {
   final String categoryName;
