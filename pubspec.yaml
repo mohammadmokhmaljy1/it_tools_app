@@ -26,9 +26,7 @@ dependencies:
 
   # Dependency Injection
   get_it: 9.3.0
-  flutter_localizations:
-    sdk: flutter
-  intl: ^0.20.3
+ 
 
   # Networking
   dio: 5.11.1
