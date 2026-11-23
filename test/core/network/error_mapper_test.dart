@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:it_tools_app/core/network/error_mapper.dart';
-import 'package:it_tools_app/core/network/failure.dart';
-import 'package:it_tools_app/core/network/result.dart';
+import 'package:it_tools_app/core/errors/failure.dart';
+import 'package:it_tools_app/core/utils/result.dart';
 
 void main() {
   group('mapDioException', () {
@@ -30,10 +30,7 @@ void main() {
       final exception = DioException(
         requestOptions: requestOptions,
         type: DioExceptionType.badResponse,
-        response: Response(
-          requestOptions: requestOptions,
-          statusCode: 401,
-        ),
+        response: Response(requestOptions: requestOptions, statusCode: 401),
       );
 
       expect(mapDioException(exception), isA<UnauthorizedFailure>());
@@ -43,10 +40,7 @@ void main() {
       final exception = DioException(
         requestOptions: requestOptions,
         type: DioExceptionType.badResponse,
-        response: Response(
-          requestOptions: requestOptions,
-          statusCode: 404,
-        ),
+        response: Response(requestOptions: requestOptions, statusCode: 404),
       );
 
       expect(mapDioException(exception), isA<NotFoundFailure>());
@@ -56,10 +50,7 @@ void main() {
       final exception = DioException(
         requestOptions: requestOptions,
         type: DioExceptionType.badResponse,
-        response: Response(
-          requestOptions: requestOptions,
-          statusCode: 422,
-        ),
+        response: Response(requestOptions: requestOptions, statusCode: 422),
       );
 
       expect(mapDioException(exception), isA<ValidationFailure>());
@@ -69,10 +60,7 @@ void main() {
       final exception = DioException(
         requestOptions: requestOptions,
         type: DioExceptionType.badResponse,
-        response: Response(
-          requestOptions: requestOptions,
-          statusCode: 500,
-        ),
+        response: Response(requestOptions: requestOptions, statusCode: 500),
       );
 
       expect(mapDioException(exception), isA<ServerFailure>());
@@ -96,10 +84,7 @@ void main() {
       });
 
       expect(result, isA<Error<String>>());
-      expect(
-        (result as Error<String>).failure,
-        isA<NetworkFailure>(),
-      );
+      expect((result as Error<String>).failure, isA<NetworkFailure>());
     });
   });
 }

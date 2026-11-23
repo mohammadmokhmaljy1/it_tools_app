@@ -13,18 +13,19 @@ Dio dio(Ref ref) {
       baseUrl: AppConfig.apiBaseUrl,
       connectTimeout: const Duration(seconds: 15),
       receiveTimeout: const Duration(seconds: 30),
-      headers: {
-        'Accept': 'application/json',
-        'Accept-Language': 'ar',
-      },
+      headers: {'Accept': 'application/json', 'Accept-Language': 'ar'},
     ),
   );
 
   if (kDebugMode) {
     client.interceptors.add(
       LogInterceptor(
-        requestBody: true,
-        responseBody: true,
+        request: true,
+        requestHeader: false,
+        requestBody: false,
+        responseHeader: false,
+        responseBody: false,
+        error: true,
       ),
     );
   }
