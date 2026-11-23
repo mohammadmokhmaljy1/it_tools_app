@@ -5,7 +5,7 @@
       "name": "IT Tools (Dev)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main_dev.dart",
+      "program": "lib/main.dart",
       "args": [
         "--flavor",
         "dev",
@@ -16,7 +16,7 @@
       "name": "IT Tools (Prod)",
       "request": "launch",
       "type": "dart",
-      "program": "lib/main_prod.dart",
+      "program": "lib/main.dart",
       "args": [
         "--flavor",
         "prod",
