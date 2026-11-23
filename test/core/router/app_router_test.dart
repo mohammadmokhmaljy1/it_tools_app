@@ -41,9 +41,40 @@ void main() {
     });
 
     testWidgets(
-      'redirects guest to /login with from param when accessing protected route and returns after login',
+      'redirects guest to /login with from param for all protected routes',
       (tester) async {
         final router = createAppRouter(authNotifier);
+
+        await tester.pumpWidget(MaterialApp.router(routerConfig: router));
+        await tester.pumpAndSettle();
+
+        final protectedPaths = [
+          AppRoutes.checkout,
+          AppRoutes.orders,
+          AppRoutes.favorites,
+          AppRoutes.editProfile,
+          AppRoutes.ratings,
+        ];
+
+        for (final path in protectedPaths) {
+          router.go(path);
+          await tester.pumpAndSettle();
+
+          expect(find.text('تسجيل الدخول'), findsOneWidget);
+          expect(
+            router.routerDelegate.currentConfiguration.uri.toString(),
+            '/login?from=${Uri.encodeComponent(path)}',
+          );
+        }
+      },
+    );
+
+    testWidgets(
+      'returns user to intended destination (from) after login without clearing cart',
+      (tester) async {
+        final router = createAppRouter(authNotifier);
+        // محاكاة وجود عناصر في سلة الزائر قبل تسجيل الدخول
+        final guestCartItems = ['Arduino Uno R3', 'Multimeter Digital'];
 
         await tester.pumpWidget(MaterialApp.router(routerConfig: router));
         await tester.pumpAndSettle();
@@ -52,7 +83,6 @@ void main() {
         router.go(AppRoutes.checkout);
         await tester.pumpAndSettle();
 
-        // التحقق من تحويله لصفحة تسجيل الدخول مع حفظ المسار الأصلي في from
         expect(find.text('تسجيل الدخول'), findsOneWidget);
         expect(
           router.routerDelegate.currentConfiguration.uri.toString(),
@@ -66,8 +96,11 @@ void main() {
         );
         await tester.pumpAndSettle();
 
-        // التحقق من إرجاعه تلقائياً إلى صفحة إتمام الطلب
+        // 1. التحقق من إرجاعه تلقائياً إلى صفحة إتمام الطلب
         expect(find.text('إتمام الطلب'), findsOneWidget);
+        // 2. التحقق من بقاء عناصر السلة محفوظة وعدم مسحها
+        expect(guestCartItems, hasLength(2));
+        expect(guestCartItems, contains('Arduino Uno R3'));
       },
     );
   });
