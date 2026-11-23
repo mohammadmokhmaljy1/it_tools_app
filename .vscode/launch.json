@@ -7,8 +7,6 @@
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
-        "--flavor",
-        "dev",
         "--dart-define-from-file=config/dev.json"
       ]
     },
@@ -18,8 +16,6 @@
       "type": "dart",
       "program": "lib/main.dart",
       "args": [
-        "--flavor",
-        "prod",
         "--dart-define-from-file=config/prod.json"
       ]
     }
