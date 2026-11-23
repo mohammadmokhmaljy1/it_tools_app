@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:it_tools_app/core/auth/auth_status_provider.dart';
 import 'package:it_tools_app/core/router/app_router.dart';
+import 'package:it_tools_app/core/router/app_routes.dart';
 import 'package:it_tools_app/core/storage/token_storage.dart';
 import 'package:mocktail/mocktail.dart';
 
@@ -37,7 +38,7 @@ void main() {
       router.go(AppRoutes.cart);
       await tester.pumpAndSettle();
 
-      expect(find.text('سلة المشتريات'), findsOneWidget);
+      expect(find.text('السلة'), findsNWidgets(2));
     });
 
     testWidgets(
@@ -48,27 +49,24 @@ void main() {
         await tester.pumpWidget(MaterialApp.router(routerConfig: router));
         await tester.pumpAndSettle();
 
-        // محاولة الزائر فتح صفحة إتمام الطلب المحمية
         router.go(AppRoutes.checkout);
         await tester.pumpAndSettle();
 
-        // التحقق من تحويله لصفحة تسجيل الدخول مع حفظ المسار الأصلي في from
         expect(find.text('تسجيل الدخول'), findsOneWidget);
         expect(
           router.routerDelegate.currentConfiguration.uri.toString(),
           '/login?from=%2Fcheckout',
         );
 
-        // محاكاة تسجيل الدخول بنجاح
         await authNotifier.setAuthenticated(
           accessToken: 'valid_token',
           refreshToken: 'valid_refresh_token',
         );
         await tester.pumpAndSettle();
 
-        // التحقق من إرجاعه تلقائياً إلى صفحة إتمام الطلب
         expect(find.text('إتمام الطلب'), findsOneWidget);
       },
     );
   });
 }
+
