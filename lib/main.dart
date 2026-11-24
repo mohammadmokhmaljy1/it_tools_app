@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 
+import "features/auth/presentation/pages/login_page.dart";
+
 void main() {
   runApp(const ItToolsApp());
 }
@@ -13,6 +15,7 @@ final GoRouter _router = GoRouter(
       builder: (context, state) =>
           const Scaffold(body: Center(child: Text('متجر IT Tools'))),
     ),
+    GoRoute(path: "/login", builder: (context, state) => const LoginPage()),
   ],
 );
 
