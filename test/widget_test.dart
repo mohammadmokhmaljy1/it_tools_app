@@ -1,30 +1,66 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:it_tools_app/main.dart';
+import 'package:it_tools_app/app/app.dart';
+import 'package:it_tools_app/core/config/app_router.dart';
+import 'package:it_tools_app/core/auth/auth_status_provider.dart';
+import 'package:it_tools_app/features/cart/presentation/pages/cart_page.dart';
+import 'package:it_tools_app/features/checkout/presentation/pages/checkout_page.dart';
+import 'package:it_tools_app/features/auth/presentation/pages/login_page.dart';
+import 'package:it_tools_app/features/auth/presentation/pages/register_page.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  setUp(() => FlutterSecureStorage.setMockInitialValues({}));
+  testWidgets('ITToolsApp opens login and registration routes', (
+    WidgetTester tester,
+  ) async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const ITToolsApp(),
+      ),
+    );
+    final router = container.read(storeRouterProvider);
+    expect(find.byType(MaterialApp), findsOneWidget);
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // انتظار انتهاء مؤقت شاشة البداية (3 ثوانٍ) حتى لا يبقى Timer معلقاً
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+    router.go(AppRouter.checkout);
+    await tester.pumpAndSettle();
+    expect(find.byType(LoginPage), findsOneWidget);
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    expect(
+      router.routerDelegate.currentConfiguration.uri.queryParameters['from'],
+      AppRouter.checkout,
+    );
+    router.go(AppRouter.register);
+    await tester.pumpAndSettle();
+    expect(find.byType(RegisterPage), findsOneWidget);
+
+    router.go(AppRouter.cart);
+    await tester.pumpAndSettle();
+    final cartState = tester.state(find.byType(CartPage));
+
+    router.push<void>(AppRouter.checkout);
+    await tester.pumpAndSettle();
+    expect(find.byType(LoginPage), findsOneWidget);
+
+    await container
+        .read(authStatusProvider)
+        .setAuthenticated(
+          accessToken: 'test-access',
+          refreshToken: 'test-refresh',
+        );
+    await tester.pumpAndSettle();
+    expect(find.byType(CheckoutPage), findsOneWidget);
+
+    router.pop();
+    await tester.pumpAndSettle();
+    expect(tester.state(find.byType(CartPage)), same(cartState));
   });
 }

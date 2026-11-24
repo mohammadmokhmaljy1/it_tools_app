@@ -1,110 +1,107 @@
 import 'package:flutter/material.dart';
 
-abstract final class AppTextStyles {
-  static const String fontFamily = 'Cairo';
+import 'package:it_tools_app/core/theme/app_colors.dart';
 
-  static const TextStyle display = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 28,
-    fontWeight: FontWeight.w700,
-  );
-
-  static const TextStyle h1 = TextStyle(
-    fontFamily: fontFamily,
+class AppTextStyles {
+  // Headings & Titles
+  static TextStyle headingH1 = const TextStyle(
+    fontFamily: 'Cairo',
     fontSize: 24,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.bold,
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle h2 = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle headingH2 = const TextStyle(
+    fontFamily: 'Cairo',
     fontSize: 20,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.bold,
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle h3 = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle headingH3 = const TextStyle(
+    fontFamily: 'Cairo',
     fontSize: 18,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w600, // SemiBold
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle titleLarge = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle titleLarge = const TextStyle(
+    fontFamily: 'Cairo',
     fontSize: 16,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.bold,
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle titleMedium = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle titleMedium = const TextStyle(
+    fontFamily: 'Cairo',
     fontSize: 16,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w600, // SemiBold
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle bodyLarge = TextStyle(
-    fontFamily: fontFamily,
+  // Body Styles
+  static TextStyle bodyLarge = const TextStyle(
+    fontFamily: 'Cairo',
     fontSize: 16,
-    fontWeight: FontWeight.w400,
+    fontWeight: FontWeight.normal, // Regular
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle bodyMedium = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle bodyMedium = const TextStyle(
+    fontFamily: 'Cairo',
     fontSize: 14,
-    fontWeight: FontWeight.w400,
+    fontWeight: FontWeight.normal, // Regular
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle bodyStrong = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle bodyStrong = const TextStyle(
+    fontFamily: 'Cairo',
     fontSize: 14,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w600, // SemiBold
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle labelMedium = TextStyle(
-    fontFamily: fontFamily,
+  // Labels & Captions
+  static TextStyle labelMedium = const TextStyle(
+    fontFamily: 'Cairo',
     fontSize: 13,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w600, // SemiBold
+    color: AppColors.textSecondary,
   );
 
-  static const TextStyle caption = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle caption = const TextStyle(
+    fontFamily: 'Cairo',
     fontSize: 12,
-    fontWeight: FontWeight.w400,
+    fontWeight: FontWeight.normal, // Regular
+    color: AppColors.textTertiary,
   );
 
-  static const TextStyle captionStrong = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle captionStrong = const TextStyle(
+    fontFamily: 'Cairo',
     fontSize: 12,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w600, // SemiBold
+    color: AppColors.textSecondary,
   );
 
-  static const TextStyle overline = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle overline = const TextStyle(
+    fontFamily: 'Cairo',
     fontSize: 10,
-    fontWeight: FontWeight.w700,
+    fontWeight: FontWeight.bold,
+    color: AppColors.textTertiary,
   );
 
-  static const TextStyle priceLarge = TextStyle(
-    fontFamily: fontFamily,
+  // Price Styles
+  static TextStyle priceLarge = const TextStyle(
+    fontFamily: 'Cairo',
     fontSize: 22,
-    fontWeight: FontWeight.w800,
+    fontWeight: FontWeight.w800, // ExtraBold
+    color: AppColors.textPrimary,
   );
 
-  static const TextStyle priceMedium = TextStyle(
-    fontFamily: fontFamily,
+  static TextStyle priceMedium = const TextStyle(
+    fontFamily: 'Cairo',
     fontSize: 16,
-    fontWeight: FontWeight.w700,
-  );
-
-  static TextTheme get textTheme => const TextTheme(
-    displaySmall: display,
-    headlineLarge: h1,
-    headlineMedium: h2,
-    headlineSmall: h3,
-    titleLarge: titleLarge,
-    titleMedium: titleMedium,
-    bodyLarge: bodyLarge,
-    bodyMedium: bodyMedium,
-    bodySmall: caption,
-    labelLarge: bodyStrong,
-    labelMedium: labelMedium,
-    labelSmall: overline,
+    fontWeight: FontWeight.bold,
+    color: AppColors.textPrimary,
   );
 }
