@@ -3,13 +3,13 @@ import 'package:it_tools_app/core/theme/app_colors.dart';
 import 'package:it_tools_app/core/theme/app_text_styles.dart';
 
 class GuestCheckoutGateSheet extends StatelessWidget {
-  final VoidCallback onContinueWithGoogle;
+  final VoidCallback? onContinueWithGoogle;
   final VoidCallback onCreateAccount;
   final VoidCallback onLogin;
 
   const GuestCheckoutGateSheet({
     super.key,
-    required this.onContinueWithGoogle,
+    this.onContinueWithGoogle,
     required this.onCreateAccount,
     required this.onLogin,
   });

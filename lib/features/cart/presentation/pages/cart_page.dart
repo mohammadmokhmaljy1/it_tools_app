@@ -146,17 +146,13 @@ class _CartPageState extends State<CartPage> {
                                 backgroundColor: Colors.transparent,
                                 builder: (sheetContext) =>
                                     GuestCheckoutGateSheet(
-                                      onContinueWithGoogle: () {
-                                        Navigator.pop(sheetContext);
-                                        context.push(AppRouter.checkout);
-                                      },
                                       onCreateAccount: () {
                                         Navigator.pop(sheetContext);
-                                        context.push(AppRouter.checkout);
+                                        context.push(AppRouter.register);
                                       },
                                       onLogin: () {
                                         Navigator.pop(sheetContext);
-                                        context.push(AppRouter.checkout);
+                                        context.push(AppRouter.login);
                                       },
                                     ),
                               );

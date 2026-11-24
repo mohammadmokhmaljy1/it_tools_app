@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:it_tools_app/core/widgets/custom_bottom_nav_bar.dart';
 import 'package:it_tools_app/core/widgets/no_internet_view.dart';
+import 'package:it_tools_app/features/auth/presentation/pages/login_page.dart';
+import 'package:it_tools_app/features/auth/presentation/pages/register_page.dart';
 import 'package:it_tools_app/features/cart/presentation/pages/cart_page.dart';
 import 'package:it_tools_app/features/catalog/presentation/pages/product_details_page.dart';
 import 'package:it_tools_app/features/categories/presentation/pages/categories_page.dart';
@@ -19,6 +21,7 @@ class AppRouter {
   static const String splash = '/';
   static const String onboarding = '/onboarding';
   static const String login = '/login';
+  static const String register = '/register';
   static const String home = '/home';
   static const String categories = '/categories';
   static const String productList = '/product-list';
@@ -38,6 +41,11 @@ class AppRouter {
       GoRoute(
         path: onboarding,
         builder: (context, state) => const OnboardingScreen(),
+      ),
+      GoRoute(path: login, builder: (context, state) => const LoginPage()),
+      GoRoute(
+        path: register,
+        builder: (context, state) => const RegisterPage(),
       ),
       GoRoute(
         path: '/home', // أو جعله المسار الافتتاحي '/' حسب هيكلة تطبيقكم
