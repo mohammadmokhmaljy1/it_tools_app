@@ -2,10 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'core/auth/auth_status_provider.dart';
+import 'core/network/dio_client.dart';
 import 'core/router/app_router.dart';
 
 void main() {
-  runApp(const ProviderScope(child: ItToolsApp()));
+  runApp(
+    ProviderScope(
+      overrides: [
+        sessionExpiredCallbackProvider.overrideWith(
+          (ref) => ref.read(authStatusProvider).sessionExpired,
+        ),
+      ],
+      child: const ItToolsApp(),
+    ),
+  );
 }
 
 class ItToolsApp extends ConsumerWidget {

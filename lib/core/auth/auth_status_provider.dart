@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../network/dio_client.dart' show tokenStorageProvider;
 import '../storage/token_storage.dart';
 
 enum AuthStatus { authenticated, guest }
@@ -53,14 +54,15 @@ class AuthStatusNotifier extends ChangeNotifier {
   Future<void> setGuest() async {
     await initialized;
     await _tokenStorage.clear();
+    sessionExpired();
+  }
+
+  void sessionExpired() {
+    if (_status == AuthStatus.guest) return;
     _status = AuthStatus.guest;
     notifyListeners();
   }
 }
-
-final tokenStorageProvider = Provider<TokenStorage>((ref) {
-  return TokenStorage();
-});
 
 final authStatusProvider = Provider<AuthStatusNotifier>((ref) {
   final storage = ref.watch(tokenStorageProvider);

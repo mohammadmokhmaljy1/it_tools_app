@@ -66,6 +66,11 @@ void main() {
         await tester.pumpAndSettle();
 
         expect(find.text('إتمام الطلب'), findsOneWidget);
+
+        authNotifier.sessionExpired();
+        await tester.pumpAndSettle();
+
+        expect(find.byType(LoginPage), findsOneWidget);
       },
     );
   });
