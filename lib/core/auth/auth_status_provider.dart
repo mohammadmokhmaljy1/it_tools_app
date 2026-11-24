@@ -3,21 +3,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../storage/token_storage.dart';
 
-enum AuthStatus { authenticated, guest }
+enum AuthStatus { loading, authenticated, guest }
 
 class AuthStatusNotifier extends ChangeNotifier {
   final TokenStorage _tokenStorage;
-  AuthStatus _status = AuthStatus.guest;
+  AuthStatus _status = AuthStatus.loading;
 
   AuthStatusNotifier(this._tokenStorage) {
     checkAuthStatus();
   }
 
   AuthStatus get status => _status;
+  bool get isLoading => _status == AuthStatus.loading;
   bool get isAuthenticated => _status == AuthStatus.authenticated;
   bool get isGuest => _status == AuthStatus.guest;
 
-  /// فحص التوكن المخزن لتحديد هل المستخدم مسجل أم زائر
+  /// فحص التوكن المخزن لتحديد حالة الجلسة بعد اكتمال التحميل
   Future<void> checkAuthStatus() async {
     final token = await _tokenStorage.readAccessToken();
     final newStatus = (token != null && token.isNotEmpty)

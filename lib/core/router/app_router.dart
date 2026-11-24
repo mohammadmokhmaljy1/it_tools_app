@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/auth/presentation/pages/forgot_password_page.dart';
+import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/auth/presentation/pages/otp_verification_page.dart';
+import '../../features/auth/presentation/pages/register_page.dart';
 import '../auth/auth_status_provider.dart';
 
 class AppRoutes {
@@ -9,6 +13,9 @@ class AppRoutes {
 
   static const String home = '/';
   static const String login = '/login';
+  static const String register = '/register';
+  static const String forgotPassword = '/forgot-password';
+  static const String otpVerification = '/otp-verification';
   static const String cart = '/cart';
   static const String checkout = '/checkout';
   static const String orders = '/orders';
@@ -37,6 +44,11 @@ GoRouter createAppRouter(AuthStatusNotifier authNotifier) {
     initialLocation: AppRoutes.home,
     refreshListenable: authNotifier,
     redirect: (BuildContext context, GoRouterState state) {
+      // 0. انتظار اكتمال قراءة الجلسة من التخزين قبل اتخاذ قرار التوجيه
+      if (authNotifier.isLoading) {
+        return null;
+      }
+
       final currentPath = state.uri.path;
       final isGuest = authNotifier.isGuest;
       final isGoingToLogin = currentPath == AppRoutes.login;
@@ -66,9 +78,24 @@ GoRouter createAppRouter(AuthStatusNotifier authNotifier) {
       ),
       GoRoute(
         path: AppRoutes.login,
-        builder: (context, state) =>
-            const Scaffold(body: Center(child: Text('تسجيل الدخول'))),
+        builder: (context, state) => const LoginPage(),
       ),
+      GoRoute(
+        path: AppRoutes.register,
+        builder: (context, state) => const RegisterPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.forgotPassword,
+        builder: (context, state) => const ForgotPasswordPage(),
+      ),
+      GoRoute(
+        path: AppRoutes.otpVerification,
+        builder: (context, state) {
+          final email = state.uri.queryParameters['email'] ?? '';
+          return OtpVerificationPage(email: email);
+        },
+      ),
+
       GoRoute(
         path: AppRoutes.cart,
         builder: (context, state) =>
