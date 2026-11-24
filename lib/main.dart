@@ -1,6 +1,10 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:it_tools_app/app/app.dart';
+
+import 'core/auth/auth_status_provider.dart';
+import 'core/network/dio_client.dart';
 
 void main() {
   // التأكد من تهيئة بيئة الفلاتر قبل تشغيل التطبيق
@@ -11,6 +15,15 @@ void main() {
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]).then((_) {
-    runApp(const ITToolsApp());
+    runApp(
+      ProviderScope(
+        overrides: [
+          sessionExpiredCallbackProvider.overrideWith(
+            (ref) => ref.read(authStatusProvider).sessionExpired,
+          ),
+        ],
+        child: const ITToolsApp(),
+      ),
+    );
   });
 }

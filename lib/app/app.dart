@@ -1,13 +1,14 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:it_tools_app/core/config/app_router.dart';
 import 'package:it_tools_app/core/theme/app_theme.dart';
 
-class ITToolsApp extends StatelessWidget {
+class ITToolsApp extends ConsumerWidget {
   const ITToolsApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
       title: 'المحيط - إكسسوارات الكمبيوتر',
       debugShowCheckedModeBanner: false,
@@ -27,7 +28,7 @@ class ITToolsApp extends StatelessWidget {
       ],
 
       // ربط الـ GoRouter لإدارة التنقل
-      routerConfig: AppRouter.router,
+      routerConfig: ref.watch(storeRouterProvider),
     );
   }
 }

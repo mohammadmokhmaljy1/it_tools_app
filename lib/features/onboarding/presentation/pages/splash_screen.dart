@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:it_tools_app/core/config/app_router.dart';
@@ -14,14 +16,20 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  late final Timer _onboardingTimer;
   @override
   void initState() {
     super.initState();
     // الانتقال تلقائياً لشاشة الـ Onboarding بعد 3 ثوانٍ كمثال
-    Future.delayed(const Duration(seconds: 3), () {
-      // ignore: use_build_context_synchronously
+    _onboardingTimer = Timer(const Duration(seconds: 3), () {
       context.go(AppRouter.onboarding);
     });
+  }
+
+  @override
+  void dispose() {
+    _onboardingTimer.cancel();
+    super.dispose();
   }
 
   @override

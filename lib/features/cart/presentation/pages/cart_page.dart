@@ -1,3 +1,5 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:it_tools_app/core/auth/auth_status_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:it_tools_app/core/config/app_router.dart';
@@ -11,14 +13,14 @@ import 'package:it_tools_app/features/cart/presentation/widgets/cart_items/cart_
 import 'package:it_tools_app/features/cart/presentation/widgets/empty_cart/empty_cart_view.dart';
 import 'package:it_tools_app/features/cart/presentation/widgets/guest_gate/guest_checkout_gate_sheet.dart';
 
-class CartPage extends StatefulWidget {
+class CartPage extends ConsumerStatefulWidget {
   const CartPage({super.key});
 
   @override
-  State<CartPage> createState() => _CartPageState();
+  ConsumerState<CartPage> createState() => _CartPageState();
 }
 
-class _CartPageState extends State<CartPage> {
+class _CartPageState extends ConsumerState<CartPage> {
   final TextEditingController _couponController = TextEditingController(
     text: 'UNI15',
   );
@@ -139,7 +141,14 @@ class _CartPageState extends State<CartPage> {
                           width: double.infinity,
                           height: 52,
                           child: ElevatedButton(
-                            onPressed: () {
+                            onPressed: () async {
+                              final auth = ref.read(authStatusProvider);
+                              await auth.initialized;
+                              if (!context.mounted) return;
+                              if (auth.isAuthenticated) {
+                                context.push(AppRouter.checkout);
+                                return;
+                              }
                               showModalBottomSheet(
                                 context: context,
                                 isScrollControlled: true,
@@ -152,7 +161,7 @@ class _CartPageState extends State<CartPage> {
                                       },
                                       onLogin: () {
                                         Navigator.pop(sheetContext);
-                                        context.push(AppRouter.login);
+                                        context.push(AppRouter.checkout);
                                       },
                                     ),
                               );

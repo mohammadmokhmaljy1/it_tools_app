@@ -1,3 +1,4 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:it_tools_app/core/widgets/custom_bottom_nav_bar.dart';
@@ -17,6 +18,8 @@ import 'package:it_tools_app/features/home/presentation/pages/home_screen.dart';
 import 'package:it_tools_app/features/onboarding/presentation/pages/splash_screen.dart';
 import 'package:it_tools_app/features/onboarding/presentation/pages/onboarding_screen.dart';
 
+import '../auth/auth_status_provider.dart';
+
 class AppRouter {
   static const String splash = '/';
   static const String onboarding = '/onboarding';
@@ -34,7 +37,33 @@ class AppRouter {
   static const String noInternet = '/no-internet';
   static const String productDetails = '/product-details';
 
-  static final GoRouter router = GoRouter(
+  static GoRouter create(AuthStatusNotifier auth) => GoRouter(
+    refreshListenable: auth,
+    redirect: (_, state) async {
+      final path = state.uri.path;
+      final protected = path == checkout || path == orderSuccess;
+      if (!protected && path != login) return null;
+
+      await auth.initialized;
+      if (protected && auth.isGuest) {
+        return Uri(
+          path: login,
+          queryParameters: {'from': state.uri.toString()},
+        ).toString();
+      }
+      if (path == login && auth.isAuthenticated) {
+        final from = state.uri.queryParameters['from'];
+        final destination = from == null ? null : Uri.tryParse(from);
+        if (destination != null &&
+            !destination.hasScheme &&
+            !destination.hasAuthority &&
+            destination.path == checkout) {
+          return destination.toString();
+        }
+        return home;
+      }
+      return null;
+    },
     initialLocation: splash,
     routes: [
       GoRoute(path: splash, builder: (context, state) => const SplashScreen()),
@@ -42,7 +71,35 @@ class AppRouter {
         path: onboarding,
         builder: (context, state) => const OnboardingScreen(),
       ),
-      GoRoute(path: login, builder: (context, state) => const LoginPage()),
+      GoRoute(
+        path: login,
+        builder: (context, state) {
+          final route = ModalRoute.of(context);
+          final destination = Uri.tryParse(
+            state.uri.queryParameters['from'] ?? '',
+          );
+          if (destination == null ||
+              destination.hasScheme ||
+              destination.hasAuthority ||
+              destination.path != checkout) {
+            return const LoginPage();
+          }
+          return ListenableBuilder(
+            listenable: auth,
+            child: const LoginPage(),
+            builder: (context, child) {
+              if (auth.isAuthenticated) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (context.mounted && route?.isCurrent == true) {
+                    context.pushReplacement(destination.toString());
+                  }
+                });
+              }
+              return child!;
+            },
+          );
+        },
+      ),
       GoRoute(
         path: register,
         builder: (context, state) => const RegisterPage(),
@@ -101,7 +158,11 @@ class AppRouter {
       GoRoute(
         path: checkout,
         name: 'checkout',
-        builder: (context, state) => const CheckoutPage(),
+        builder: (context, state) => ListenableBuilder(
+          listenable: auth,
+          builder: (context, _) =>
+              auth.isAuthenticated ? const CheckoutPage() : const LoginPage(),
+        ),
       ),
       GoRoute(
         path: orderSuccess,
@@ -135,3 +196,9 @@ class AppRouter {
     ],
   );
 }
+
+final storeRouterProvider = Provider<GoRouter>((ref) {
+  final router = AppRouter.create(ref.watch(authStatusProvider));
+  ref.onDispose(router.dispose);
+  return router;
+});
