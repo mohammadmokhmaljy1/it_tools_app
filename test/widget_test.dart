@@ -1,8 +1,10 @@
-﻿import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:it_tools_app/main.dart';
 
 void main() {
+  setUp(() => FlutterSecureStorage.setMockInitialValues({}));
   testWidgets('App displays the five bottom navigation tabs', (
     WidgetTester tester,
   ) async {
@@ -16,4 +18,3 @@ void main() {
     expect(find.text('حسابي'), findsOneWidget);
   });
 }
-

@@ -1,7 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../features/auth/presentation/pages/login_page.dart';
 import '../auth/auth_status_provider.dart';
 import 'app_routes.dart';
 
@@ -9,7 +10,8 @@ GoRouter createAppRouter(AuthStatusNotifier authNotifier) {
   return GoRouter(
     initialLocation: AppRoutes.home,
     refreshListenable: authNotifier,
-    redirect: (BuildContext context, GoRouterState state) {
+    redirect: (BuildContext context, GoRouterState state) async {
+      await authNotifier.initialized;
       final currentPath = state.uri.path;
       final isGuest = authNotifier.isGuest;
       final isGoingToLogin = currentPath == AppRoutes.login;
@@ -21,8 +23,12 @@ GoRouter createAppRouter(AuthStatusNotifier authNotifier) {
 
       if (!isGuest && isGoingToLogin) {
         final fromParam = state.uri.queryParameters['from'];
-        if (fromParam != null && fromParam.isNotEmpty) {
-          return Uri.decodeComponent(fromParam);
+        final destination = fromParam == null ? null : Uri.tryParse(fromParam);
+        if (destination != null &&
+            !destination.hasScheme &&
+            !destination.hasAuthority &&
+            AppRoutes.isProtected(destination.path)) {
+          return destination.toString();
         }
         return AppRoutes.home;
       }
@@ -77,8 +83,7 @@ GoRouter createAppRouter(AuthStatusNotifier authNotifier) {
             routes: [
               GoRoute(
                 path: AppRoutes.home,
-                builder: (context, state) =>
-                    const _TabPage(title: 'الرئيسية'),
+                builder: (context, state) => const _TabPage(title: 'الرئيسية'),
               ),
             ],
           ),
@@ -86,8 +91,7 @@ GoRouter createAppRouter(AuthStatusNotifier authNotifier) {
             routes: [
               GoRoute(
                 path: AppRoutes.categories,
-                builder: (context, state) =>
-                    const _TabPage(title: 'التصنيفات'),
+                builder: (context, state) => const _TabPage(title: 'التصنيفات'),
               ),
             ],
           ),
@@ -95,8 +99,7 @@ GoRouter createAppRouter(AuthStatusNotifier authNotifier) {
             routes: [
               GoRoute(
                 path: AppRoutes.cart,
-                builder: (context, state) =>
-                    const _TabPage(title: 'السلة'),
+                builder: (context, state) => const _TabPage(title: 'السلة'),
               ),
             ],
           ),
@@ -104,8 +107,7 @@ GoRouter createAppRouter(AuthStatusNotifier authNotifier) {
             routes: [
               GoRoute(
                 path: AppRoutes.favorites,
-                builder: (context, state) =>
-                    const _TabPage(title: 'المفضلة'),
+                builder: (context, state) => const _TabPage(title: 'المفضلة'),
               ),
             ],
           ),
@@ -113,8 +115,7 @@ GoRouter createAppRouter(AuthStatusNotifier authNotifier) {
             routes: [
               GoRoute(
                 path: AppRoutes.profile,
-                builder: (context, state) =>
-                    const _TabPage(title: 'حسابي'),
+                builder: (context, state) => const _TabPage(title: 'حسابي'),
               ),
             ],
           ),
@@ -122,33 +123,27 @@ GoRouter createAppRouter(AuthStatusNotifier authNotifier) {
       ),
       GoRoute(
         path: AppRoutes.login,
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('تسجيل الدخول')),
-        ),
+        builder: (context, state) => const LoginPage(),
       ),
       GoRoute(
         path: AppRoutes.checkout,
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('إتمام الطلب')),
-        ),
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('إتمام الطلب'))),
       ),
       GoRoute(
         path: AppRoutes.orders,
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('طلباتي')),
-        ),
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('طلباتي'))),
       ),
       GoRoute(
         path: AppRoutes.editProfile,
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('تعديل الحساب')),
-        ),
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('تعديل الحساب'))),
       ),
       GoRoute(
         path: AppRoutes.ratings,
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('التقييم')),
-        ),
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('التقييم'))),
       ),
     ],
   );
@@ -162,15 +157,14 @@ class _TabPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.headlineSmall,
-      ),
+      child: Text(title, style: Theme.of(context).textTheme.headlineSmall),
     );
   }
 }
 
 final appRouterProvider = Provider<GoRouter>((ref) {
   final authNotifier = ref.watch(authStatusProvider);
-  return createAppRouter(authNotifier);
+  final router = createAppRouter(authNotifier);
+  ref.onDispose(router.dispose);
+  return router;
 });

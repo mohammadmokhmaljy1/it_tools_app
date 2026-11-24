@@ -9,9 +9,9 @@ class AuthStatusNotifier extends ChangeNotifier {
   final TokenStorage _tokenStorage;
   AuthStatus _status = AuthStatus.guest;
 
-  AuthStatusNotifier(this._tokenStorage) {
-    checkAuthStatus();
-  }
+  AuthStatusNotifier(this._tokenStorage);
+
+  late final Future<void> initialized = checkAuthStatus();
 
   AuthStatus get status => _status;
   bool get isAuthenticated => _status == AuthStatus.authenticated;
@@ -19,7 +19,12 @@ class AuthStatusNotifier extends ChangeNotifier {
 
   /// فحص التوكن المخزن لتحديد هل المستخدم مسجل أم زائر
   Future<void> checkAuthStatus() async {
-    final token = await _tokenStorage.readAccessToken();
+    String? token;
+    try {
+      token = await _tokenStorage.readAccessToken();
+    } catch (_) {
+      return;
+    }
     final newStatus = (token != null && token.isNotEmpty)
         ? AuthStatus.authenticated
         : AuthStatus.guest;
@@ -35,6 +40,7 @@ class AuthStatusNotifier extends ChangeNotifier {
     required String accessToken,
     required String refreshToken,
   }) async {
+    await initialized;
     await _tokenStorage.saveTokens(
       accessToken: accessToken,
       refreshToken: refreshToken,
@@ -45,6 +51,7 @@ class AuthStatusNotifier extends ChangeNotifier {
 
   /// تسجيل الخروج والتحويل إلى زائر
   Future<void> setGuest() async {
+    await initialized;
     await _tokenStorage.clear();
     _status = AuthStatus.guest;
     notifyListeners();

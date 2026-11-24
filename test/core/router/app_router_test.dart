@@ -1,9 +1,10 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:it_tools_app/core/auth/auth_status_provider.dart';
 import 'package:it_tools_app/core/router/app_router.dart';
 import 'package:it_tools_app/core/router/app_routes.dart';
 import 'package:it_tools_app/core/storage/token_storage.dart';
+import 'package:it_tools_app/features/auth/presentation/pages/login_page.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockTokenStorage extends Mock implements TokenStorage {}
@@ -52,7 +53,7 @@ void main() {
         router.go(AppRoutes.checkout);
         await tester.pumpAndSettle();
 
-        expect(find.text('تسجيل الدخول'), findsOneWidget);
+        expect(find.byType(LoginPage), findsOneWidget);
         expect(
           router.routerDelegate.currentConfiguration.uri.toString(),
           '/login?from=%2Fcheckout',
@@ -69,4 +70,3 @@ void main() {
     );
   });
 }
-
