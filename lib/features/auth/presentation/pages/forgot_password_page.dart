@@ -166,10 +166,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           ),
                         ),
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty)
+                          if (value == null || value.trim().isEmpty) {
                             return 'يرجى إدخال البريد الإلكتروني';
-                          if (!value.contains('@') || !value.contains('.'))
+                          }
+                          if (!value.contains('@') || !value.contains('.')) {
                             return 'البريد الإلكتروني غير صالح';
+                          }
                           return null;
                         },
                       ),
