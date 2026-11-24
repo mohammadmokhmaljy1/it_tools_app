@@ -1,40 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import "features/auth/presentation/pages/login_page.dart";
+import 'core/auth/auth_status_provider.dart';
+import 'core/network/dio_client.dart';
+import 'core/router/app_router.dart';
 
 void main() {
-  runApp(const ItToolsApp());
+  runApp(
+    ProviderScope(
+      overrides: [
+        sessionExpiredCallbackProvider.overrideWith(
+          (ref) => ref.read(authStatusProvider).sessionExpired,
+        ),
+      ],
+      child: const ItToolsApp(),
+    ),
+  );
 }
 
-final GoRouter _router = GoRouter(
-  routes: [
-    GoRoute(
-      path: '/',
-      builder: (context, state) =>
-          const Scaffold(body: Center(child: Text('متجر IT Tools'))),
-    ),
-    GoRoute(path: "/login", builder: (context, state) => const LoginPage()),
-  ],
-);
-
-class ItToolsApp extends StatelessWidget {
+class ItToolsApp extends ConsumerWidget {
   const ItToolsApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final router = ref.watch(appRouterProvider);
+
     return MaterialApp.router(
       title: 'IT Tools',
       debugShowCheckedModeBanner: false,
       locale: const Locale('ar'),
       supportedLocales: const [Locale('ar')],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      routerConfig: _router,
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      routerConfig: router,
     );
   }
 }
