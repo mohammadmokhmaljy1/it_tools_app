@@ -1,3 +1,9 @@
+import 'package:go_router/go_router.dart';
+
+import '../../../../core/config/app_router.dart';
+import '../../../../core/constants/app_assets.dart';
+import '../models/order_preview.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -100,18 +106,16 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
                   padding: const EdgeInsets.all(16),
                   children: [
                     _buildOrderCard(
-                      orderId: '#10482',
+                      order: OrderPreview.newOrder,
                       date: '10 تشرين الثاني 2026 - 3 منتجات',
-                      statusText: 'جديد',
                       statusColor: const Color(0xFFE3F2FD),
                       textColor: const Color(0xFF1976D2),
                       total: '\$76.50',
                     ),
                     const SizedBox(height: 16),
                     _buildOrderCard(
-                      orderId: '#10482',
+                      order: OrderPreview.shipping,
                       date: '10 تشرين الثاني 2026 - 3 منتجات',
-                      statusText: 'قيد التوصيل',
                       statusColor: const Color(0xFFE8F5E9),
                       textColor: const Color(0xFF388E3C),
                       total: '\$76.50',
@@ -123,18 +127,16 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
                   padding: const EdgeInsets.all(16),
                   children: [
                     _buildOrderCard(
-                      orderId: '#10482',
+                      order: OrderPreview.completed,
                       date: '10 تشرين الثاني 2026 - 3 منتجات',
-                      statusText: 'مكتمل',
                       statusColor: const Color(0xFFE8F5E9),
                       textColor: const Color(0xFF388E3C),
                       total: '\$76.50',
                     ),
                     const SizedBox(height: 16),
                     _buildOrderCard(
-                      orderId: '#10482',
+                      order: OrderPreview.cancelled,
                       date: '10 تشرين الثاني 2026 - 3 منتجات',
-                      statusText: 'ملغي',
                       statusColor: const Color(0xFFFFEBEE),
                       textColor: const Color(0xFFD32F2F),
                       total: '\$76.50',
@@ -150,9 +152,8 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
   }
 
   Widget _buildOrderCard({
-    required String orderId,
+    required OrderPreview order,
     required String date,
-    required String statusText,
     required Color statusColor,
     required Color textColor,
     required String total,
@@ -188,7 +189,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: Text(
-                    statusText,
+                    order.label,
                     style: TextStyle(
                       color: textColor,
                       fontSize: 12,
@@ -197,7 +198,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
                   ),
                 ),
                 Text(
-                  'طلب $orderId',
+                  'طلب #${order.id}',
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -218,11 +219,11 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                _buildProductThumbnail('assets/images/mouse.png'),
+                _buildProductThumbnail(AppAssets.productMouse),
                 const SizedBox(width: 8),
-                _buildProductThumbnail('assets/images/keyboard.png'),
+                _buildProductThumbnail(AppAssets.productKeyboard),
                 const SizedBox(width: 8),
-                _buildProductThumbnail('assets/images/headset.png'),
+                _buildProductThumbnail(AppAssets.productHeadset),
               ],
             ),
             const Padding(
@@ -234,7 +235,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
               children: [
                 TextButton(
                   onPressed: () {
-                    // تفاصيل الطلب
+                    context.push('${AppRouter.orders}/${order.id}');
                   },
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,

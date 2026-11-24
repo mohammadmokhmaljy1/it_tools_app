@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:it_tools_app/features/orders/presentation/pages/order_details_page.dart';
-import 'package:it_tools_app/features/orders/presentation/pages/orders_page.dart';
 
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../auth/auth_status_provider.dart';
@@ -134,15 +132,9 @@ GoRouter createAppRouter(AuthStatusNotifier authNotifier) {
       ),
       GoRoute(
         path: AppRoutes.orders,
-        builder: (context, state) => const OrdersPage(),
-        routes: [
-          GoRoute(
-            path: ':id',
-            builder: (context, state) => const OrderDetailsPage(),
-          ),
-        ],
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('طلباتي'))),
       ),
-
       GoRoute(
         path: AppRoutes.editProfile,
         builder: (context, state) =>
