@@ -36,6 +36,9 @@
      ```
    *(يمكن أيضاً التشغيل مباشرة من قائمة **Run and Debug** في VS Code باختيار `IT Tools (Dev)` أو `IT Tools (Prod)`).*
 
+
+   يستخدم ملفا dev وprod حاليًا عنوان API المنشور نفسه. عند تخصيص خادم تطوير مستقل، حدّث `API_BASE_URL` في `config/dev.json`.
+
 ---
 
 ## 3. أوامر توليد الكود والفحص (Code Generation & Linting)
