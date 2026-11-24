@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:it_tools_app/app/app.dart';
 
-
 void main() {
   // التأكد من تهيئة بيئة الفلاتر قبل تشغيل التطبيق
   WidgetsFlutterBinding.ensureInitialized();
@@ -15,4 +14,3 @@ void main() {
     runApp(const ITToolsApp());
   });
 }
-
