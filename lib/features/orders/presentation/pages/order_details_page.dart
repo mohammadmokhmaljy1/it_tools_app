@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/constants/app_assets.dart';
 import '../models/order_preview.dart';
 
 class OrderDetailsPage extends ConsumerWidget {
@@ -190,32 +189,20 @@ class OrderDetailsPage extends ConsumerWidget {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    _buildProductItem(
-                      name: 'كيبورد ميكانيكي %75 لاسلكي',
-                      details: 'كحلي · 1 × Blue',
-                      price: '\$33.60',
-                      assetPath: AppAssets.productKeyboard,
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8),
-                      child: Divider(color: Color(0xFFF1F5F9)),
-                    ),
-                    _buildProductItem(
-                      name: 'ماوس لاسلكي صامت M331',
-                      details: 'أسود · 2 ×',
-                      price: '\$38.00',
-                      assetPath: AppAssets.productMouse,
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 8),
-                      child: Divider(color: Color(0xFFF1F5F9)),
-                    ),
-                    _buildProductItem(
-                      name: 'سماعة ألعاب مع مايك',
-                      details: 'أسود/أزرق · 1 ×',
-                      price: '\$35.00',
-                      assetPath: AppAssets.productHeadset,
-                    ),
+                    for (final (index, product)
+                        in orderPreviewProducts.indexed) ...[
+                      if (index > 0)
+                        const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8),
+                          child: Divider(color: Color(0xFFF1F5F9)),
+                        ),
+                      _buildProductItem(
+                        name: product.name,
+                        details: product.details,
+                        price: product.price,
+                        assetPath: product.assetPath,
+                      ),
+                    ],
                   ],
                 ),
               ),

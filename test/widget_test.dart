@@ -95,5 +95,18 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('طلب #10482'), findsOneWidget);
     expect(tester.takeException(), isNull);
+
+    router.go('${AppRouter.ratings}/10482');
+    await tester.pumpAndSettle();
+    expect(find.text('التقييم متاح للطلبات المكتملة فقط'), findsOneWidget);
+
+    router.go('${AppRouter.orders}/10480');
+    await tester.pumpAndSettle();
+    final rateButton = find.text('قيّم مشترياتك');
+    await tester.ensureVisible(rateButton);
+    await tester.tap(rateButton);
+    await tester.pumpAndSettle();
+    expect(find.text('ماوس لاسلكي صامت M331'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }

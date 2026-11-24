@@ -24,6 +24,8 @@ import '../../features/orders/presentation/models/order_preview.dart';
 import '../../features/orders/presentation/pages/order_details_page.dart';
 import '../../features/orders/presentation/pages/orders_page.dart';
 
+import '../../features/reviews/presentation/pages/rate_products_page.dart';
+
 class AppRouter {
   static const String splash = '/';
   static const String onboarding = '/onboarding';
@@ -37,6 +39,7 @@ class AppRouter {
   static const String profile = '/profile';
   static const String search = '/search';
   static const String orders = '/orders';
+  static const String ratings = '/ratings';
   static const String checkout = '/checkout';
   static const String orderSuccess = '/order-success';
   static const String noInternet = '/no-internet';
@@ -45,7 +48,8 @@ class AppRouter {
   static bool _isOrderPath(String path) =>
       path == orders || path.startsWith('$orders/');
 
-  static bool _canResume(String path) => path == checkout || _isOrderPath(path);
+  static bool _canResume(String path) =>
+      path == checkout || _isOrderPath(path) || path.startsWith('$ratings/');
 
   static GoRouter create(AuthStatusNotifier auth) => GoRouter(
     refreshListenable: auth,
@@ -191,12 +195,40 @@ class AppRouter {
                       body: Center(child: Text('الطلب غير موجود')),
                     );
                   }
-                  return OrderDetailsPage(order: order);
+                  return OrderDetailsPage(
+                    order: order,
+                    onRate: () => context.push('$ratings/${order.id}'),
+                  );
                 },
               );
             },
           ),
         ],
+      ),
+      GoRoute(
+        path: '$ratings/:orderId',
+        builder: (context, state) => ListenableBuilder(
+          listenable: auth,
+          builder: (context, _) {
+            if (!auth.isAuthenticated) return const LoginPage();
+            final order = OrderPreview.fromId(state.pathParameters['orderId']);
+            if (order != OrderPreview.completed) {
+              return const Scaffold(
+                body: Center(child: Text('التقييم متاح للطلبات المكتملة فقط')),
+              );
+            }
+            return RateProductsPage(
+              key: ValueKey(order),
+              products: [
+                for (final product in orderPreviewProducts)
+                  ProductRatingItem(
+                    name: product.name,
+                    assetPath: product.assetPath,
+                  ),
+              ],
+            );
+          },
+        ),
       ),
       GoRoute(
         path: checkout,
