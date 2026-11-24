@@ -127,6 +127,40 @@ void main() {
       },
     );
 
+    test('an unrelated 401 does not refresh or clear the session', () async {
+      await tokenStorage.saveTokens(
+        accessToken: 'access',
+        refreshToken: 'refresh',
+      );
+      final dio = Dio(BaseOptions(baseUrl: 'https://example.com'));
+      final refreshDio = Dio(BaseOptions(baseUrl: 'https://example.com'));
+      addTearDown(() {
+        dio.close();
+        refreshDio.close();
+      });
+      var refreshCalls = 0;
+      refreshDio.httpClientAdapter = MockHttpAdapter((_) async {
+        refreshCalls++;
+        return ResponseBody.fromString('{}', 500);
+      });
+      dio.httpClientAdapter = MockHttpAdapter(
+        (_) async => ResponseBody.fromString(
+          '{"error":{"code":"UNAUTHORIZED"}}',
+          401,
+          headers: {
+            Headers.contentTypeHeader: [Headers.jsonContentType],
+          },
+        ),
+      );
+      dio.interceptors.add(
+        AuthInterceptor(tokenStorage: tokenStorage, refreshDio: refreshDio),
+      );
+
+      await expectLater(dio.get<dynamic>('/me'), throwsA(isA<DioException>()));
+      expect(refreshCalls, 0);
+      expect(await tokenStorage.readRefreshToken(), 'refresh');
+    });
+
     test('handles storage read and write failures gracefully', () async {
       // 1. فشل قراءة التخزين لا يُسقط الطلب العام
       when(() => mockSecureStorage.read(key: any(named: 'key')))

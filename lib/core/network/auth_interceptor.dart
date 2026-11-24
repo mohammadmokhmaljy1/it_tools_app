@@ -7,6 +7,8 @@ class AuthInterceptor extends QueuedInterceptor {
   final TokenStorage _tokenStorage;
   final Dio _refreshDio;
   final VoidCallback? onSessionExpired;
+  String? _lastExpiredToken;
+  String? _lastRotatedToken;
 
   /// عقد تجديد الجلسة الموثّق في API Reference
   static const String refreshEndpoint = '/auth/refresh';
@@ -24,6 +26,9 @@ class AuthInterceptor extends QueuedInterceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
+    if (options.uri.origin != Uri.parse(_refreshDio.options.baseUrl).origin) {
+      return handler.next(options);
+    }
     final accessToken = await _tokenStorage.readAccessToken();
 
     if (accessToken != null && accessToken.isNotEmpty) {
@@ -43,28 +48,28 @@ class AuthInterceptor extends QueuedInterceptor {
     }
 
     final errorCode = _extractErrorCode(err.response?.data);
-    if (errorCode == invalidRefreshTokenCode) {
-      await _handleLogout();
+    final request = err.requestOptions;
+    final authorization = request.headers['Authorization'];
+    if (errorCode != tokenExpiredCode ||
+        request.uri.origin != Uri.parse(_refreshDio.options.baseUrl).origin ||
+        authorization is! String ||
+        !authorization.startsWith('Bearer ') ||
+        request.data is Stream ||
+        request.data is FormData) {
       return handler.next(err);
     }
 
-    // منع محاولة التجديد أكثر من مرة لنفس الطلب
-    if (err.requestOptions.extra['isRetry'] == true) {
-      await _handleLogout();
-      return handler.next(err);
-    }
-
-    // معالجة طلبات 401 المتزامنة:
-    // إذا كان طلب سابق في الطابور قد جدّد التوكن وحفظه بالفعل، نعيد إرسال هذا الطلب بالتوكن الجديد مباشرةً
-    final failedAuthHeader =
-        err.requestOptions.headers['Authorization'] as String?;
-    final failedToken = failedAuthHeader?.replaceFirst('Bearer ', '');
+    final failedToken = authorization.substring('Bearer '.length);
     final latestAccessToken = await _tokenStorage.readAccessToken();
-
-    if (latestAccessToken != null &&
-        latestAccessToken.isNotEmpty &&
-        latestAccessToken != failedToken) {
-      return _retryRequest(err.requestOptions, latestAccessToken, handler, err);
+    if (latestAccessToken == null || latestAccessToken.isEmpty) {
+      return handler.next(err);
+    }
+    if (latestAccessToken != failedToken) {
+      if (failedToken == _lastExpiredToken &&
+          latestAccessToken == _lastRotatedToken) {
+        return _retryRequest(request, latestAccessToken, handler, err);
+      }
+      return handler.next(err);
     }
 
     final refreshToken = await _tokenStorage.readRefreshToken();
@@ -80,7 +85,10 @@ class AuthInterceptor extends QueuedInterceptor {
         data: {'refreshToken': refreshToken},
       );
 
-      final tokens = _parseRefreshTokens(response.data, refreshToken);
+      final tokens = _parseRefreshTokens(response.data);
+      if (await _tokenStorage.readAccessToken() != failedToken) {
+        return handler.next(err);
+      }
       if (tokens == null) {
         await _handleLogout();
         return handler.next(err);
@@ -92,12 +100,21 @@ class AuthInterceptor extends QueuedInterceptor {
         refreshToken: tokens.refreshToken,
       );
 
+      _lastExpiredToken = failedToken;
+      _lastRotatedToken = tokens.accessToken;
       return await _retryRequest(
         err.requestOptions,
         tokens.accessToken,
         handler,
         err,
       );
+    } on DioException catch (refreshError) {
+      if (_extractErrorCode(refreshError.response?.data) ==
+              invalidRefreshTokenCode &&
+          await _tokenStorage.readAccessToken() == failedToken) {
+        await _handleLogout();
+      }
+      return handler.next(err);
     } catch (_) {
       // عند فشل التجديد أو فشل التخزين: مسح التوكن وتحويل المستخدم لزائر (Guest)
       await _handleLogout();
@@ -112,10 +129,13 @@ class AuthInterceptor extends QueuedInterceptor {
     DioException originalError,
   ) async {
     try {
-      requestOptions.headers['Authorization'] = 'Bearer $newAccessToken';
-      requestOptions.extra['isRetry'] = true;
-
-      final retryResponse = await _refreshDio.fetch<dynamic>(requestOptions);
+      final retryOptions = requestOptions.copyWith(
+        headers: {
+          ...requestOptions.headers,
+          'Authorization': 'Bearer $newAccessToken',
+        },
+      );
+      final retryResponse = await _refreshDio.fetch<dynamic>(retryOptions);
       return handler.resolve(retryResponse);
     } on DioException catch (retryError) {
       return handler.next(retryError);
@@ -128,16 +148,17 @@ class AuthInterceptor extends QueuedInterceptor {
     if (responseData is Map<String, dynamic>) {
       final error = responseData['error'];
       if (error is Map<String, dynamic>) {
-        return error['code'] as String?;
+        final code = error['code'];
+        return code is String ? code : null;
       }
-      return responseData['code'] as String?;
+      final code = responseData['code'];
+      return code is String ? code : null;
     }
     return null;
   }
 
   ({String accessToken, String refreshToken})? _parseRefreshTokens(
     dynamic responseData,
-    String fallbackRefreshToken,
   ) {
     if (responseData is! Map<String, dynamic>) return null;
 
@@ -145,18 +166,21 @@ class AuthInterceptor extends QueuedInterceptor {
         ? responseData['data'] as Map<String, dynamic>
         : responseData;
 
-    final accessToken =
-        (payload['accessToken'] ?? payload['access_token']) as String?;
-    if (accessToken == null || accessToken.isEmpty) return null;
-
-    final refreshToken =
-        (payload['refreshToken'] ?? payload['refresh_token']) as String? ??
-        fallbackRefreshToken;
+    final accessToken = payload['accessToken'];
+    final refreshToken = payload['refreshToken'];
+    if (accessToken is! String ||
+        accessToken.isEmpty ||
+        refreshToken is! String ||
+        refreshToken.isEmpty) {
+      return null;
+    }
 
     return (accessToken: accessToken, refreshToken: refreshToken);
   }
 
   Future<void> _handleLogout() async {
+    _lastExpiredToken = null;
+    _lastRotatedToken = null;
     await _tokenStorage.clear();
     onSessionExpired?.call();
   }
