@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:it_tools_app/features/reviews/presentation/pages/rate_products_page.dart';
 
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../auth/auth_status_provider.dart';
@@ -143,17 +142,8 @@ GoRouter createAppRouter(AuthStatusNotifier authNotifier) {
       ),
       GoRoute(
         path: AppRoutes.ratings,
-        builder: (context, state) {
-          final products = state.extra is List<ProductRatingItem>
-              ? state.extra as List<ProductRatingItem>
-              : [
-                  ProductRatingItem(
-                    name: 'كيبورد ميكانيكي %75 لاسلكي',
-                    assetPath: 'assets/images/products/keyboard_mech.png',
-                  ),
-                ];
-          return RateProductsPage(products: products);
-        },
+        builder: (context, state) =>
+            const Scaffold(body: Center(child: Text('التقييم'))),
       ),
     ],
   );

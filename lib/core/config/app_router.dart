@@ -20,6 +20,12 @@ import 'package:it_tools_app/features/onboarding/presentation/pages/onboarding_s
 
 import '../auth/auth_status_provider.dart';
 
+import '../../features/orders/presentation/models/order_preview.dart';
+import '../../features/orders/presentation/pages/order_details_page.dart';
+import '../../features/orders/presentation/pages/orders_page.dart';
+
+import '../../features/reviews/presentation/pages/rate_products_page.dart';
+
 class AppRouter {
   static const String splash = '/';
   static const String onboarding = '/onboarding';
@@ -32,16 +38,24 @@ class AppRouter {
   static const String favorites = '/favorites';
   static const String profile = '/profile';
   static const String search = '/search';
+  static const String orders = '/orders';
+  static const String ratings = '/ratings';
   static const String checkout = '/checkout';
   static const String orderSuccess = '/order-success';
   static const String noInternet = '/no-internet';
   static const String productDetails = '/product-details';
 
+  static bool _isOrderPath(String path) =>
+      path == orders || path.startsWith('$orders/');
+
+  static bool _canResume(String path) =>
+      path == checkout || _isOrderPath(path) || path.startsWith('$ratings/');
+
   static GoRouter create(AuthStatusNotifier auth) => GoRouter(
     refreshListenable: auth,
     redirect: (_, state) async {
       final path = state.uri.path;
-      final protected = path == checkout || path == orderSuccess;
+      final protected = _canResume(path) || path == orderSuccess;
       if (!protected && path != login) return null;
 
       await auth.initialized;
@@ -57,7 +71,7 @@ class AppRouter {
         if (destination != null &&
             !destination.hasScheme &&
             !destination.hasAuthority &&
-            destination.path == checkout) {
+            _canResume(destination.path)) {
           return destination.toString();
         }
         return home;
@@ -81,7 +95,7 @@ class AppRouter {
           if (destination == null ||
               destination.hasScheme ||
               destination.hasAuthority ||
-              destination.path != checkout) {
+              !_canResume(destination.path)) {
             return const LoginPage();
           }
           return ListenableBuilder(
@@ -128,7 +142,12 @@ class AppRouter {
         path: profile,
         name: 'profile',
         builder: (context, state) => Scaffold(
-          body: const Center(child: Text('حسابي - قيد التجهيز')),
+          body: Center(
+            child: TextButton(
+              onPressed: () => context.push(orders),
+              child: const Text('طلباتي'),
+            ),
+          ),
           bottomNavigationBar: CustomBottomNavBar(
             currentIndex: 4,
             onTap: (index) {
@@ -154,6 +173,62 @@ class AppRouter {
         path: search,
         name: 'search',
         builder: (context, state) => const SearchPage(),
+      ),
+      GoRoute(
+        path: orders,
+        builder: (context, state) => ListenableBuilder(
+          listenable: auth,
+          builder: (context, _) =>
+              auth.isAuthenticated ? const OrdersPage() : const LoginPage(),
+        ),
+        routes: [
+          GoRoute(
+            path: ':id',
+            builder: (context, state) {
+              final order = OrderPreview.fromId(state.pathParameters['id']);
+              return ListenableBuilder(
+                listenable: auth,
+                builder: (context, _) {
+                  if (!auth.isAuthenticated) return const LoginPage();
+                  if (order == null) {
+                    return const Scaffold(
+                      body: Center(child: Text('الطلب غير موجود')),
+                    );
+                  }
+                  return OrderDetailsPage(
+                    order: order,
+                    onRate: () => context.push('$ratings/${order.id}'),
+                  );
+                },
+              );
+            },
+          ),
+        ],
+      ),
+      GoRoute(
+        path: '$ratings/:orderId',
+        builder: (context, state) => ListenableBuilder(
+          listenable: auth,
+          builder: (context, _) {
+            if (!auth.isAuthenticated) return const LoginPage();
+            final order = OrderPreview.fromId(state.pathParameters['orderId']);
+            if (order != OrderPreview.completed) {
+              return const Scaffold(
+                body: Center(child: Text('التقييم متاح للطلبات المكتملة فقط')),
+              );
+            }
+            return RateProductsPage(
+              key: ValueKey(order),
+              products: [
+                for (final product in orderPreviewProducts)
+                  ProductRatingItem(
+                    name: product.name,
+                    assetPath: product.assetPath,
+                  ),
+              ],
+            );
+          },
+        ),
       ),
       GoRoute(
         path: checkout,

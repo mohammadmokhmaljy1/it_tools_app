@@ -146,12 +146,14 @@ class _RateProductsPageState extends ConsumerState<RateProductsPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _items.isEmpty
+                  onPressed: _items.every((item) => item.rating == 0)
                       ? null
                       : () {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(
-                              content: Text('تم حفظ تقييماتك بنجاح'),
+                              content: Text(
+                                'التقييم للمعاينة فقط. الحفظ غير متاح حاليًا.',
+                              ),
                             ),
                           );
                         },
@@ -215,7 +217,7 @@ class _RateProductsPageState extends ConsumerState<RateProductsPage> {
                     ),
                     const SizedBox(height: 6),
                     Text(
-                      isRated ? 'تم التقييم' : 'لم تُقيّم بعد',
+                      isRated ? 'تم اختيار تقييم' : 'لم تُقيّم بعد',
                       style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w600,

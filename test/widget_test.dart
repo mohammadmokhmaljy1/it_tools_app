@@ -10,6 +10,8 @@ import 'package:it_tools_app/features/checkout/presentation/pages/checkout_page.
 import 'package:it_tools_app/features/auth/presentation/pages/login_page.dart';
 import 'package:it_tools_app/features/auth/presentation/pages/register_page.dart';
 
+import 'package:it_tools_app/features/orders/presentation/pages/orders_page.dart';
+
 void main() {
   setUp(() => FlutterSecureStorage.setMockInitialValues({}));
   testWidgets('ITToolsApp opens login and registration routes', (
@@ -62,5 +64,49 @@ void main() {
     router.pop();
     await tester.pumpAndSettle();
     expect(tester.state(find.byType(CartPage)), same(cartState));
+  });
+  testWidgets('orders require a session and open the selected details', (
+    tester,
+  ) async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: const ITToolsApp(),
+      ),
+    );
+    final router = container.read(storeRouterProvider);
+
+    router.go(AppRouter.orders);
+    await tester.pumpAndSettle();
+    expect(find.byType(LoginPage), findsOneWidget);
+
+    await container
+        .read(authStatusProvider)
+        .setAuthenticated(
+          accessToken: 'test-access',
+          refreshToken: 'test-refresh',
+        );
+    await tester.pumpAndSettle();
+    expect(find.byType(OrdersPage), findsOneWidget);
+
+    await tester.tap(find.text('التفاصيل').first);
+    await tester.pumpAndSettle();
+    expect(find.text('طلب #10482'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+
+    router.go('${AppRouter.ratings}/10482');
+    await tester.pumpAndSettle();
+    expect(find.text('التقييم متاح للطلبات المكتملة فقط'), findsOneWidget);
+
+    router.go('${AppRouter.orders}/10480');
+    await tester.pumpAndSettle();
+    final rateButton = find.text('قيّم مشترياتك');
+    await tester.ensureVisible(rateButton);
+    await tester.tap(rateButton);
+    await tester.pumpAndSettle();
+    expect(find.text('ماوس لاسلكي صامت M331'), findsOneWidget);
+    expect(tester.takeException(), isNull);
   });
 }
