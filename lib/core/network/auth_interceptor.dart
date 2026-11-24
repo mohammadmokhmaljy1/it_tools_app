@@ -8,8 +8,10 @@ class AuthInterceptor extends QueuedInterceptor {
   final Dio _refreshDio;
   final VoidCallback? onSessionExpired;
 
-  // TODO: تثبيت مسار التجديد وشكل الرد من صفحة API Reference عند جاهزية الـ Backend
-  static const String _refreshEndpoint = '/auth/refresh';
+  /// عقد تجديد الجلسة الموثّق في API Reference
+  static const String refreshEndpoint = '/auth/refresh';
+  static const String tokenExpiredCode = 'TOKEN_EXPIRED';
+  static const String invalidRefreshTokenCode = 'INVALID_REFRESH_TOKEN';
 
   AuthInterceptor({
     required this._tokenStorage,
@@ -40,10 +42,29 @@ class AuthInterceptor extends QueuedInterceptor {
       return handler.next(err);
     }
 
+    final errorCode = _extractErrorCode(err.response?.data);
+    if (errorCode == invalidRefreshTokenCode) {
+      await _handleLogout();
+      return handler.next(err);
+    }
+
     // منع محاولة التجديد أكثر من مرة لنفس الطلب
     if (err.requestOptions.extra['isRetry'] == true) {
       await _handleLogout();
       return handler.next(err);
+    }
+
+    // معالجة طلبات 401 المتزامنة:
+    // إذا كان طلب سابق في الطابور قد جدّد التوكن وحفظه بالفعل، نعيد إرسال هذا الطلب بالتوكن الجديد مباشرةً
+    final failedAuthHeader =
+        err.requestOptions.headers['Authorization'] as String?;
+    final failedToken = failedAuthHeader?.replaceFirst('Bearer ', '');
+    final latestAccessToken = await _tokenStorage.readAccessToken();
+
+    if (latestAccessToken != null &&
+        latestAccessToken.isNotEmpty &&
+        latestAccessToken != failedToken) {
+      return _retryRequest(err.requestOptions, latestAccessToken, handler, err);
     }
 
     final refreshToken = await _tokenStorage.readRefreshToken();
@@ -53,34 +74,86 @@ class AuthInterceptor extends QueuedInterceptor {
     }
 
     try {
-      // محاولة واحدة لتجديد التوكن باستخدام نسخة Dio مستقلة
-      final response = await _refreshDio.post(
-        _refreshEndpoint,
-        data: {'refresh_token': refreshToken},
+      // طلب تجديد واحد فقط باستخدام نسخة Dio مستقلة (Token Rotation)
+      final response = await _refreshDio.post<dynamic>(
+        refreshEndpoint,
+        data: {'refreshToken': refreshToken},
       );
 
-      final data = response.data as Map<String, dynamic>;
-      final newAccessToken = data['access_token'] as String;
-      final newRefreshToken =
-          (data['refresh_token'] as String?) ?? refreshToken;
+      final tokens = _parseRefreshTokens(response.data, refreshToken);
+      if (tokens == null) {
+        await _handleLogout();
+        return handler.next(err);
+      }
 
+      // حفظ الزوج الجديد (accessToken + refreshToken)؛ في حال فشل التخزين نُنهي الجلسة بأمان
       await _tokenStorage.saveTokens(
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
+        accessToken: tokens.accessToken,
+        refreshToken: tokens.refreshToken,
       );
 
-      // إعادة إرسال الطلب الأصلي بالتوكن الجديد
-      final retryOptions = err.requestOptions;
-      retryOptions.headers['Authorization'] = 'Bearer $newAccessToken';
-      retryOptions.extra['isRetry'] = true;
-
-      final retryResponse = await _refreshDio.fetch(retryOptions);
-      return handler.resolve(retryResponse);
+      return await _retryRequest(
+        err.requestOptions,
+        tokens.accessToken,
+        handler,
+        err,
+      );
     } catch (_) {
-      // في حال فشل التجديد: مسح التوكن وتحويل المستخدم لزائر (Guest)
+      // عند فشل التجديد أو فشل التخزين: مسح التوكن وتحويل المستخدم لزائر (Guest)
       await _handleLogout();
       return handler.next(err);
     }
+  }
+
+  Future<void> _retryRequest(
+    RequestOptions requestOptions,
+    String newAccessToken,
+    ErrorInterceptorHandler handler,
+    DioException originalError,
+  ) async {
+    try {
+      requestOptions.headers['Authorization'] = 'Bearer $newAccessToken';
+      requestOptions.extra['isRetry'] = true;
+
+      final retryResponse = await _refreshDio.fetch<dynamic>(requestOptions);
+      return handler.resolve(retryResponse);
+    } on DioException catch (retryError) {
+      return handler.next(retryError);
+    } catch (_) {
+      return handler.next(originalError);
+    }
+  }
+
+  String? _extractErrorCode(dynamic responseData) {
+    if (responseData is Map<String, dynamic>) {
+      final error = responseData['error'];
+      if (error is Map<String, dynamic>) {
+        return error['code'] as String?;
+      }
+      return responseData['code'] as String?;
+    }
+    return null;
+  }
+
+  ({String accessToken, String refreshToken})? _parseRefreshTokens(
+    dynamic responseData,
+    String fallbackRefreshToken,
+  ) {
+    if (responseData is! Map<String, dynamic>) return null;
+
+    final payload = responseData['data'] is Map<String, dynamic>
+        ? responseData['data'] as Map<String, dynamic>
+        : responseData;
+
+    final accessToken =
+        (payload['accessToken'] ?? payload['access_token']) as String?;
+    if (accessToken == null || accessToken.isEmpty) return null;
+
+    final refreshToken =
+        (payload['refreshToken'] ?? payload['refresh_token']) as String? ??
+        fallbackRefreshToken;
+
+    return (accessToken: accessToken, refreshToken: refreshToken);
   }
 
   Future<void> _handleLogout() async {
