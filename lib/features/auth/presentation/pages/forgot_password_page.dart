@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'otp_verification_page.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -24,9 +25,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => OtpVerificationPage(
-            email: _emailController.text.trim(),
-          ),
+          builder: (context) =>
+              OtpVerificationPage(email: _emailController.text.trim()),
         ),
       );
     }
@@ -44,7 +44,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             padding: const EdgeInsets.all(24.0),
             child: ConstrainedBox(
               constraints: BoxConstraints(
-                minHeight: MediaQuery.of(context).size.height - MediaQuery.of(context).padding.top - 48,
+                minHeight:
+                    MediaQuery.of(context).size.height -
+                    MediaQuery.of(context).padding.top -
+                    48,
               ),
               child: IntrinsicHeight(
                 child: Form(
@@ -70,7 +73,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             alignment: Alignment.centerRight,
                             child: IconButton(
                               onPressed: () => Navigator.pop(context),
-                              icon: const Icon(Icons.arrow_forward_ios, size: 18, color: Colors.black87),
+                              icon: const Icon(
+                                Icons.arrow_forward_ios,
+                                size: 18,
+                                color: Colors.black87,
+                              ),
                               style: IconButton.styleFrom(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
@@ -116,7 +123,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       const SizedBox(height: 32),
 
                       // حقل البريد الإلكتروني مع الفالديشن
-                      const Text('البريد الإلكتروني', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                      const Text(
+                        'البريد الإلكتروني',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _emailController,
@@ -125,15 +138,38 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         decoration: InputDecoration(
                           hintText: 'example@domain.com',
                           hintStyle: const TextStyle(color: Colors.grey),
-                          prefixIcon: const Icon(Icons.email_outlined, color: Colors.grey),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.grey)),
-                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color(0xFF0578B7), width: 2)),
-                          errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red, width: 1)),
+                          prefixIcon: const Icon(
+                            Icons.email_outlined,
+                            color: Colors.grey,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(color: Colors.grey),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Color(0xFF0578B7),
+                              width: 2,
+                            ),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: const BorderSide(
+                              color: Colors.red,
+                              width: 1,
+                            ),
+                          ),
                         ),
                         validator: (value) {
-                          if (value == null || value.trim().isEmpty) return 'يرجى إدخال البريد الإلكتروني';
-                          if (!value.contains('@') || !value.contains('.')) return 'البريد الإلكتروني غير صالح';
+                          if (value == null || value.trim().isEmpty)
+                            return 'يرجى إدخال البريد الإلكتروني';
+                          if (!value.contains('@') || !value.contains('.'))
+                            return 'البريد الإلكتروني غير صالح';
                           return null;
                         },
                       ),

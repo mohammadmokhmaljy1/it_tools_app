@@ -1,27 +1,21 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class OtpVerificationPage extends ConsumerStatefulWidget {
+class OtpVerificationPage extends StatefulWidget {
   final String email;
 
-  const OtpVerificationPage({
-    super.key,
-    required this.email,
-  });
+  const OtpVerificationPage({super.key, required this.email});
 
   @override
-  ConsumerState<OtpVerificationPage> createState() =>
-      _OtpVerificationPageState();
+  State<OtpVerificationPage> createState() => _OtpVerificationPageState();
 }
 
-class _OtpVerificationPageState
-    extends ConsumerState<OtpVerificationPage> {
-  final List<TextEditingController> _controllers =
-      List.generate(6, (index) => TextEditingController());
+class _OtpVerificationPageState extends State<OtpVerificationPage> {
+  final List<TextEditingController> _controllers = List.generate(
+    6,
+    (index) => TextEditingController(),
+  );
 
-  final List<FocusNode> _focusNodes =
-      List.generate(6, (index) => FocusNode());
+  final List<FocusNode> _focusNodes = List.generate(6, (index) => FocusNode());
 
   @override
   void dispose() {
@@ -50,9 +44,7 @@ class _OtpVerificationPageState
 
     // سيتم ربط التحقق الفعلي بالـ Backend لاحقاً.
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('تم إدخال الرمز بنجاح، بانتظار ربط التحقق'),
-      ),
+      const SnackBar(content: Text('تم إدخال الرمز بنجاح، بانتظار ربط التحقق')),
     );
   }
 
@@ -82,8 +74,7 @@ class _OtpVerificationPageState
 
       body: SafeArea(
         child: SingleChildScrollView(
-          keyboardDismissBehavior:
-              ScrollViewKeyboardDismissBehavior.onDrag,
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
           padding: const EdgeInsets.symmetric(horizontal: 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -124,10 +115,7 @@ class _OtpVerificationPageState
               // البريد الإلكتروني
               Text(
                 'أرسلنا رمزاً من 6 أرقام إلى\n${widget.email}',
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey,
-                ),
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
                 textAlign: TextAlign.center,
               ),
 
@@ -140,9 +128,7 @@ class _OtpVerificationPageState
                   children: List.generate(6, (index) {
                     return Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 3,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 3),
                         child: _buildOtpBox(index),
                       ),
                     );
@@ -166,10 +152,7 @@ class _OtpVerificationPageState
                   SizedBox(width: 4),
                   Text(
                     'إعادة إرسال الرمز بعد',
-                    style: TextStyle(
-                      color: Colors.grey,
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: Colors.grey, fontSize: 13),
                   ),
                 ],
               ),
@@ -183,9 +166,7 @@ class _OtpVerificationPageState
                   onPressed: _verifyOtp,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF0077B6),
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 16,
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -230,17 +211,11 @@ class _OtpVerificationPageState
           contentPadding: EdgeInsets.zero,
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(
-              color: Color(0xFFB3E5FC),
-              width: 1.5,
-            ),
+            borderSide: const BorderSide(color: Color(0xFFB3E5FC), width: 1.5),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(10),
-            borderSide: const BorderSide(
-              color: Color(0xFF0077B6),
-              width: 2,
-            ),
+            borderSide: const BorderSide(color: Color(0xFF0077B6), width: 2),
           ),
           filled: true,
           fillColor: const Color(0xFFF1F8FF),

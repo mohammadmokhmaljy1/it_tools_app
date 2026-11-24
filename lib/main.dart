@@ -1,30 +1,40 @@
 import 'package:flutter/material.dart';
-import 'features/auth/presentation/pages/login_page.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:go_router/go_router.dart';
+
+import "features/auth/presentation/pages/login_page.dart";
 
 void main() {
-  runApp(const ITToolsApp());
+  runApp(const ItToolsApp());
 }
 
-class ITToolsApp extends StatelessWidget {
-  const ITToolsApp({super.key});
+final GoRouter _router = GoRouter(
+  routes: [
+    GoRoute(
+      path: '/',
+      builder: (context, state) =>
+          const Scaffold(body: Center(child: Text('متجر IT Tools'))),
+    ),
+    GoRoute(path: "/login", builder: (context, state) => const LoginPage()),
+  ],
+);
+
+class ItToolsApp extends StatelessWidget {
+  const ItToolsApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'IT Tools App',
+    return MaterialApp.router(
+      title: 'IT Tools',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Cairo',
-        primaryColor: const Color(0xFF0578B7),
-        scaffoldBackgroundColor: const Color(0xFFFFFFFF),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0578B7),
-          primary: const Color(0xFF0578B7),
-        ),
-        useMaterial3: true,
-      ),
-      // جعل شاشة تسجيل الدخول هي البداية مؤقتاً للتجربة والتصميم
-      home: const LoginPage(),
+      locale: const Locale('ar'),
+      supportedLocales: const [Locale('ar')],
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      routerConfig: _router,
     );
   }
 }

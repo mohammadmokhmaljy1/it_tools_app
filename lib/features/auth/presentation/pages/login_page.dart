@@ -1,5 +1,5 @@
-
 import 'package:flutter/material.dart';
+
 import 'register_page.dart';
 import 'forgot_password_page.dart';
 
@@ -29,9 +29,7 @@ class _LoginPageState extends State<LoginPage> {
     if (_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text(
-            'تم التحقق من البيانات بنجاح، جاري تسجيل الدخول...',
-          ),
+          content: Text('تم التحقق من البيانات بنجاح، جاري تسجيل الدخول...'),
           backgroundColor: Color(0xFF0578B7),
         ),
       );
@@ -74,19 +72,13 @@ class _LoginPageState extends State<LoginPage> {
 
                   const Text(
                     'سجّل دخولك لمتابعة حسابك.',
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   const SizedBox(height: 32),
 
                   const Text(
                     'البريد الإلكتروني',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(height: 8),
 
@@ -107,9 +99,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade300,
-                        ),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -140,10 +130,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   const Text(
                     'كلمة المرور',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(height: 8),
 
@@ -173,9 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(
-                          color: Colors.grey.shade300,
-                        ),
+                        borderSide: BorderSide(color: Colors.grey.shade300),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -212,8 +197,7 @@ class _LoginPageState extends State<LoginPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                const ForgotPasswordPage(),
+                            builder: (context) => const ForgotPasswordPage(),
                           ),
                         );
                       },
@@ -254,23 +238,12 @@ class _LoginPageState extends State<LoginPage> {
 
                   Row(
                     children: [
-                      Expanded(
-                        child: Divider(
-                          color: Colors.grey.shade300,
-                        ),
-                      ),
+                      Expanded(child: Divider(color: Colors.grey.shade300)),
                       const Padding(
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
-                        child: Text(
-                          'أو',
-                          style: TextStyle(color: Colors.grey),
-                        ),
+                        child: Text('أو', style: TextStyle(color: Colors.grey)),
                       ),
-                      Expanded(
-                        child: Divider(
-                          color: Colors.grey.shade300,
-                        ),
-                      ),
+                      Expanded(child: Divider(color: Colors.grey.shade300)),
                     ],
                   ),
                   const SizedBox(height: 20),
@@ -283,9 +256,7 @@ class _LoginPageState extends State<LoginPage> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        side: BorderSide(
-                          color: Colors.grey.shade300,
-                        ),
+                        side: BorderSide(color: Colors.grey.shade300),
                       ),
                       onPressed: () {},
                       child: Row(
@@ -322,8 +293,7 @@ class _LoginPageState extends State<LoginPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  const RegisterPage(),
+                              builder: (context) => const RegisterPage(),
                             ),
                           );
                         },
@@ -377,10 +347,7 @@ class _GoogleLogoPainter extends CustomPainter {
 
     paint.color = const Color(0xFFEA4335);
     canvas.drawArc(
-      Rect.fromCircle(
-        center: center,
-        radius: radius - strokeWidth / 2,
-      ),
+      Rect.fromCircle(center: center, radius: radius - strokeWidth / 2),
       -2.35,
       1.6,
       false,
@@ -389,10 +356,7 @@ class _GoogleLogoPainter extends CustomPainter {
 
     paint.color = const Color(0xFFFBBC05);
     canvas.drawArc(
-      Rect.fromCircle(
-        center: center,
-        radius: radius - strokeWidth / 2,
-      ),
+      Rect.fromCircle(center: center, radius: radius - strokeWidth / 2),
       2.35,
       1.6,
       false,
@@ -401,10 +365,7 @@ class _GoogleLogoPainter extends CustomPainter {
 
     paint.color = const Color(0xFF34A853);
     canvas.drawArc(
-      Rect.fromCircle(
-        center: center,
-        radius: radius - strokeWidth / 2,
-      ),
+      Rect.fromCircle(center: center, radius: radius - strokeWidth / 2),
       0.75,
       1.6,
       false,
@@ -413,10 +374,7 @@ class _GoogleLogoPainter extends CustomPainter {
 
     paint.color = const Color(0xFF4285F4);
     canvas.drawArc(
-      Rect.fromCircle(
-        center: center,
-        radius: radius - strokeWidth / 2,
-      ),
+      Rect.fromCircle(center: center, radius: radius - strokeWidth / 2),
       -0.05,
       0.85,
       false,
@@ -428,12 +386,7 @@ class _GoogleLogoPainter extends CustomPainter {
       ..style = PaintingStyle.fill;
 
     canvas.drawRect(
-      Rect.fromLTWH(
-        w * 0.5,
-        h * 0.41,
-        w * 0.48,
-        strokeWidth,
-      ),
+      Rect.fromLTWH(w * 0.5, h * 0.41, w * 0.48, strokeWidth),
       linePaint,
     );
   }
