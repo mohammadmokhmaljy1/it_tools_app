@@ -16,7 +16,7 @@
 
 1. **استنساخ المستودع (Clone):**
    ```bash
-   git clone https://github.com
+   git clone https://github.com/mohammadmokhmaljy1/it_tools_app.git
    cd it_tools_app
    ```
 

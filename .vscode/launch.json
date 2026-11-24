@@ -6,7 +6,7 @@
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
-      "args": [
+      "toolArgs": [
         "--dart-define-from-file=config/dev.json"
       ]
     },
@@ -15,7 +15,7 @@
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
-      "args": [
+      "toolArgs": [
         "--dart-define-from-file=config/prod.json"
       ]
     }
