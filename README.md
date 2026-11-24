@@ -16,7 +16,7 @@
 
 1. **استنساخ المستودع (Clone):**
    ```bash
-   git clone https://github.com
+   git clone https://github.com/mohammadmokhmaljy1/it_tools_app.git
    cd it_tools_app
    ```
 
@@ -35,6 +35,9 @@
      flutter run --dart-define-from-file=config/prod.json
      ```
    *(يمكن أيضاً التشغيل مباشرة من قائمة **Run and Debug** في VS Code باختيار `IT Tools (Dev)` أو `IT Tools (Prod)`).*
+
+
+   يستخدم ملفا dev وprod حاليًا عنوان API المنشور نفسه. عند تخصيص خادم تطوير مستقل، حدّث `API_BASE_URL` في `config/dev.json`.
 
 ---
 

@@ -1,13 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
-import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../config/app_config.dart';
 
-part 'dio_client.g.dart';
-
-@Riverpod(keepAlive: true)
-Dio dio(Ref ref) {
+final dioProvider = Provider<Dio>((ref) {
   final client = Dio(
     BaseOptions(
       baseUrl: AppConfig.apiBaseUrl,
@@ -25,10 +22,11 @@ Dio dio(Ref ref) {
         requestBody: false,
         responseHeader: false,
         responseBody: false,
-        error: true,
+        error: false,
       ),
     );
   }
 
+  ref.onDispose(() => client.close(force: true));
   return client;
-}
+});

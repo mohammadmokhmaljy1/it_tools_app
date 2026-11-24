@@ -1,17 +1,14 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-void main() {
-  testWidgets('Basic Flutter widget test', (WidgetTester tester) async {
-    await tester.pumpWidget(
-      const MaterialApp(
-        home: Scaffold(
-          body: Text('IT Tools App'),
-        ),
-      ),
-    );
+import 'package:it_tools_app/main.dart';
 
-    expect(find.text('IT Tools App'), findsOneWidget);
+void main() {
+  testWidgets('ItToolsApp renders smoke test', (WidgetTester tester) async {
+    await tester.pumpWidget(const ItToolsApp());
+    await tester.pumpAndSettle();
+
+    expect(find.byType(MaterialApp), findsOneWidget);
+    expect(find.byType(Scaffold), findsOneWidget);
   });
 }

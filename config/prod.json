@@ -1,0 +1,4 @@
+{
+  "APP_ENV": "prod",
+  "API_BASE_URL": "https://it-tools-e-store-api.vercel.app/api/v1"
+}
