@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -17,27 +19,43 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
+  Timer? _splashTimer;
+  bool _timerDone = false;
+  bool? _seenOnboarding;
+
   @override
   void initState() {
     super.initState();
-    _bootstrapApp();
+    _splashTimer = Timer(const Duration(seconds: 2), () {
+      _timerDone = true;
+      _navigateIfReady();
+    });
+    _loadInitialData();
   }
 
-  Future<void> _bootstrapApp() async {
+  Future<void> _loadInitialData() async {
     final results = await Future.wait([
-      Future<void>.delayed(const Duration(seconds: 2)),
       ref.read(appConfigProvider.future),
       hasSeenOnboarding(),
     ]);
-
     if (!mounted) return;
+    _seenOnboarding = results[1] as bool;
+    _navigateIfReady();
+  }
 
-    final seenOnboarding = results[2] as bool;
-    if (seenOnboarding) {
+  void _navigateIfReady() {
+    if (!mounted || !_timerDone || _seenOnboarding == null) return;
+    if (_seenOnboarding!) {
       context.go(AppRouter.home);
     } else {
       context.go(AppRouter.onboarding);
     }
+  }
+
+  @override
+  void dispose() {
+    _splashTimer?.cancel();
+    super.dispose();
   }
 
   @override
