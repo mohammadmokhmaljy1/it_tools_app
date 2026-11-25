@@ -7,6 +7,8 @@ import 'package:it_tools_app/core/theme/app_colors.dart';
 import 'package:it_tools_app/core/theme/app_text_styles.dart';
 import 'package:it_tools_app/features/onboarding/presentation/widgets/onboarding_item_widget.dart';
 
+import '../providers/app_config_provider.dart';
+
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
 
@@ -18,7 +20,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentIndex = 0;
 
-  // بيانات صفحات الـ Onboarding الثلاث المستخرجة من الفيجما
   final List<Map<String, String>> _onboardingData = [
     {
       'image': AppAssets.onboarding1,
@@ -43,15 +44,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  void _onNextPressed() {
+  Future<void> _completeAndNavigate(String route) async {
+    await setOnboardingSeen();
+    if (!mounted) return;
+    context.go(route);
+  }
+
+  Future<void> _onNextPressed() async {
     if (_currentIndex < _onboardingData.length - 1) {
-      _pageController.nextPage(
+      await _pageController.nextPage(
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     } else {
-      // استبدليها بالمسار التالي لاحقاً (مثلاً الشاشة الرئيسية)
-      context.go(AppRouter.home);
+      await _completeAndNavigate(AppRouter.home);
     }
   }
 
@@ -62,7 +68,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // الشريط العلوي (1/3 على اليمين، وتخطي على اليسار في وضع RTL)
             Padding(
               padding: const EdgeInsets.symmetric(
                 horizontal: 24.0,
@@ -71,18 +76,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // عداد الصفحات على اليمين
                   Text(
                     '${_currentIndex + 1}/3',
                     style: AppTextStyles.labelMedium.copyWith(
                       color: AppColors.textTertiary,
                     ),
                   ),
-                  // زر التخطي على اليسار
                   TextButton(
-                    onPressed: () {
-                      context.go(AppRouter.login);
-                    },
+                    onPressed: () => _completeAndNavigate(AppRouter.login),
                     child: Text(
                       'تخطي',
                       style: AppTextStyles.titleMedium.copyWith(
@@ -93,8 +94,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 ],
               ),
             ),
-
-            // محتوى الصفحات عبر الـ PageView
             Expanded(
               child: PageView.builder(
                 controller: _pageController,
@@ -113,8 +112,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 },
               ),
             ),
-
-            // مؤشر النقاط التفاعلي (Dots Indicator)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(
@@ -134,8 +131,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               ),
             ),
             const SizedBox(height: 24),
-
-            // الأزرار السفلية (تم رفعها للأعلى عبر زيادة الـ padding السفلي وإضافة تباعد)
             Padding(
               padding: const EdgeInsets.fromLTRB(24.0, 8.0, 24.0, 32.0),
               child: Column(
@@ -154,9 +149,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   if (_currentIndex == 2) ...[
                     const SizedBox(height: 12),
                     TextButton(
-                      onPressed: () {
-                        context.go(AppRouter.login);
-                      },
+                      onPressed: () => _completeAndNavigate(AppRouter.login),
                       child: Text(
                         'تسجيل الدخول',
                         style: AppTextStyles.titleMedium.copyWith(
