@@ -1,9 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-import 'features/auth/presentation/pages/login_page.dart';
+import 'package:it_tools_app/firebase_options.dart';
+import 'package:it_tools_app/features/auth/presentation/pages/register_page.dart';
+import 'package:it_tools_app/core/theme/app_theme.dart';
 
-void main() {
-  runApp(const ITToolsApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  runApp(
+    const ProviderScope(
+      child: ITToolsApp(),
+    ),
+  );
 }
 
 class ITToolsApp extends StatelessWidget {
@@ -14,18 +28,8 @@ class ITToolsApp extends StatelessWidget {
     return MaterialApp(
       title: 'IT Tools App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        fontFamily: 'Cairo',
-        primaryColor: const Color(0xFF0578B7),
-        scaffoldBackgroundColor: const Color(0xFFFFFFFF),
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF0578B7),
-          primary: const Color(0xFF0578B7),
-        ),
-        useMaterial3: true,
-      ),
-      // جعل شاشة تسجيل الدخول هي البداية مؤقتاً للتجربة والتصميم
-      home: const LoginPage(),
+      theme: AppTheme.light(),
+      home: const RegisterPage(),
     );
   }
 }
