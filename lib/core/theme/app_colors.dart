@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 @immutable
@@ -109,6 +110,41 @@ class AppColors extends ThemeExtension<AppColors> {
     statusInfo: Color(0xFF0578B7),
     statusInfoBg: Color(0xFFE1F1FB),
     overlayScrim: Color(0xFF02112C),
+  );
+
+  static const dark = AppColors(
+    brandBlue: Color(0xFF0D1B2F),
+    royalBlue: Color(0xFF0D1B2F),
+    navy700: Color(0xFF0D1B2F),
+    navy900: Color(0xFF0D1B2F),
+    sky: Color(0xFF0D1B2F),
+    orange: Color(0xFF0D1B2F),
+    ice: Color(0xFF0D1B2F),
+    bgPage: Color(0xFF07111F),
+    bgSurface: Color(0xFF0D1B2F),
+    bgSubtle: Color(0xFF0D1B2F),
+    textPrimary: Color(0xFF0D1B2F),
+    textSecondary: Color(0xFF0D1B2F),
+    textTertiary: Color(0xFF0D1B2F),
+    textOnBrand: Color(0xFF0D1B2F),
+    textOnAccent: Color(0xFF0D1B2F),
+    textLink: Color(0xFF0D1B2F),
+    borderDefault: Color(0xFF0D1B2F),
+    borderStrong: Color(0xFF0D1B2F),
+    borderFocus: Color(0xFF0D1B2F),
+    actionPrimary: Color(0xFF0D1B2F),
+    actionPrimaryPressed: Color(0xFF0D1B2F),
+    actionAccent: Color(0xFF0D1B2F),
+    actionDisabled: Color(0xFF0D1B2F),
+    statusSuccess: Color(0xFF0D1B2F),
+    statusSuccessBg: Color(0xFF0D1B2F),
+    statusDanger: Color(0xFF0D1B2F),
+    statusDangerBg: Color(0xFF0D1B2F),
+    statusWarning: Color(0xFF0D1B2F),
+    statusWarningBg: Color(0xFF0D1B2F),
+    statusInfo: Color(0xFF0D1B2F),
+    statusInfoBg: Color(0xFF0D1B2F),
+    overlayScrim: Color(0xFF07111F),
   );
 
   @override

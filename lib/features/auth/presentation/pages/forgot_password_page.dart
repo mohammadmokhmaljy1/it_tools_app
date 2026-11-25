@@ -1,5 +1,7 @@
+
 import 'package:flutter/material.dart';
 
+import 'package:it_tools_app/core/theme/theme_extension.dart';
 import 'otp_verification_page.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -34,8 +36,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFFFFFF),
+      backgroundColor: colors.bgSurface,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Directionality(
@@ -59,13 +63,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       Stack(
                         alignment: Alignment.center,
                         children: [
-                          const Center(
+                          Center(
                             child: Text(
                               'استعادة الحساب',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.black87,
+                                color: colors.textPrimary,
                               ),
                             ),
                           ),
@@ -73,15 +77,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             alignment: Alignment.centerRight,
                             child: IconButton(
                               onPressed: () => Navigator.pop(context),
-                              icon: const Icon(
+                              icon: Icon(
                                 Icons.arrow_forward_ios,
                                 size: 18,
-                                color: Colors.black87,
+                                color: colors.textPrimary,
                               ),
                               style: IconButton.styleFrom(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
-                                  side: BorderSide(color: Colors.grey.shade300),
+                                  side: BorderSide(
+                                    color: colors.borderDefault,
+                                  ),
                                 ),
                                 padding: const EdgeInsets.all(10),
                               ),
@@ -96,38 +102,42 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         width: 70,
                         height: 70,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFE8F3FA),
+                          color: colors.bgSubtle,
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: const Icon(
+                        child: Icon(
                           Icons.lock_reset_rounded,
-                          color: Color(0xFF0578B7),
+                          color: colors.brandBlue,
                           size: 34,
                         ),
                       ),
                       const SizedBox(height: 20),
 
-                      const Text(
+                      Text(
                         'نسيت كلمة المرور؟',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: colors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 8),
-                      const Text(
+                      Text(
                         'أدخل بريدك الإلكتروني وسنرسل لك رمزاً لإعادة تعيين كلمة المرور.',
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: colors.textSecondary,
+                        ),
                       ),
                       const SizedBox(height: 32),
 
                       // حقل البريد الإلكتروني مع الفالديشن
-                      const Text(
+                      Text(
                         'البريد الإلكتروني',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
+                          color: colors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -137,41 +147,51 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           hintText: 'example@domain.com',
-                          hintStyle: const TextStyle(color: Colors.grey),
-                          prefixIcon: const Icon(
+                          hintStyle: TextStyle(
+                            color: colors.textTertiary,
+                          ),
+                          prefixIcon: Icon(
                             Icons.email_outlined,
-                            color: Colors.grey,
+                            color: colors.textSecondary,
                           ),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: Colors.grey),
+                            borderSide: BorderSide(
+                              color: colors.borderDefault,
+                            ),
                           ),
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
+                            borderSide: BorderSide(
+                              color: colors.borderDefault,
+                            ),
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Color(0xFF0578B7),
+                            borderSide: BorderSide(
+                              color: colors.borderFocus,
                               width: 2,
                             ),
                           ),
                           errorBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(
-                              color: Colors.red,
+                            borderSide: BorderSide(
+                              color: colors.statusDanger,
                               width: 1,
                             ),
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.trim().isEmpty)
-                            return 'يرجى إدخال البريد الإلكتروني';
-                          if (!value.contains('@') || !value.contains('.'))
-                            return 'البريد الإلكتروني غير صالح';
-                          return null;
-                        },
+                      validator: (value) {
+  if (value == null || value.trim().isEmpty) {
+    return 'يرجى إدخال البريد الإلكتروني';
+  }
+
+  if (!value.contains('@') || !value.contains('.')) {
+    return 'البريد الإلكتروني غير صالح';
+  }
+
+  return null;
+},
                       ),
 
                       const Spacer(),
@@ -183,7 +203,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         height: 50,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF0578B7),
+                            backgroundColor: colors.actionPrimary,
+                            foregroundColor: colors.textOnBrand,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -194,7 +215,6 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
                             ),
                           ),
                         ),
