@@ -3,7 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// عدّلي هذا المسار ليشير إلى ملف user_profile_provider.dart في مشروعك
+import 'package:it_tools_app/core/theme/app_colors.dart';
+import 'package:it_tools_app/core/theme/theme_extension.dart';
 import '../providers/user_profile_provider.dart';
 
 class EditProfilePage extends ConsumerStatefulWidget {
@@ -14,6 +15,8 @@ class EditProfilePage extends ConsumerStatefulWidget {
 }
 
 class _EditProfilePageState extends ConsumerState<EditProfilePage> {
+  AppColors get _colors => context.colors;
+
   final _formKey = GlobalKey<FormState>();
   late final TextEditingController _nameController;
   late final TextEditingController _emailController;
@@ -65,19 +68,17 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
   }
 
   Future<void> _pickImage() async {
-  await ref
-      .read(userProfileProvider.notifier)
-      .pickAvatarFromGallery();
+    await ref.read(userProfileProvider.notifier).pickAvatarFromGallery();
 
-  final savedPath = ref.read(userProfileProvider).avatarPath;
+    final savedPath = ref.read(userProfileProvider).avatarPath;
 
-  if (savedPath == null || !mounted) return;
+    if (savedPath == null || !mounted) return;
 
-  setState(() {
-    _tempAvatarPath = savedPath;
-    _clearAvatar = false;
-  });
-}
+    setState(() {
+      _tempAvatarPath = savedPath;
+      _clearAvatar = false;
+    });
+  }
 
   Future<void> _saveChanges() async {
     if (!_formKey.currentState!.validate()) return;
@@ -113,11 +114,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: _colors.bgSurface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (context) {
+        final colors = context.colors;
         return StatefulBuilder(
           builder: (context, setModalState) {
             return Container(
@@ -131,7 +133,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                       width: 40,
                       height: 4,
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                        color: colors.borderStrong,
                         borderRadius: BorderRadius.circular(2),
                       ),
                     ),
@@ -141,15 +143,15 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.close, color: Colors.black87),
+                        icon: Icon(Icons.close, color: colors.textSecondary),
                         onPressed: () => Navigator.pop(context),
                       ),
-                      const Text(
+                      Text(
                         'اختر الجامعة أو المعهد',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF0F172A),
+                          color: colors.textPrimary,
                         ),
                       ),
                       const SizedBox(width: 48),
@@ -182,8 +184,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                     style: TextStyle(
                                       fontSize: 14,
                                       color: isSelected
-                                          ? const Color(0xFF0578B7)
-                                          : const Color(0xFF0F172A),
+                                          ? colors.brandBlue
+                                          : colors.textPrimary,
                                       fontWeight: isSelected
                                           ? FontWeight.bold
                                           : FontWeight.normal,
@@ -194,7 +196,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                 Radio<String>(
                                   value: university,
                                   groupValue: tempSelected,
-                                  activeColor: const Color(0xFF0578B7),
+                                  activeColor: colors.brandBlue,
                                   onChanged: (value) {
                                     if (value != null) {
                                       setModalState(() {
@@ -219,19 +221,19 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                       Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0578B7),
+                      backgroundColor: colors.actionPrimary,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
+                    child: Text(
                       'تأكيد الاختيار',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                        color: colors.textOnBrand,
                       ),
                     ),
                   ),
@@ -246,6 +248,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final current = ref.watch(userProfileProvider);
     final previewName = _nameController.text.trim();
     final initialLetter = previewName.isNotEmpty
@@ -258,16 +261,16 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
         File(_tempAvatarPath!).existsSync();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4FBFF),
+      backgroundColor: colors.bgPage,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF4FBFF),
+        backgroundColor: colors.bgPage,
         elevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        title: const Text(
+        title: Text(
           'تعديل الملف الشخصي',
           style: TextStyle(
-            color: Color(0xFF0F172A),
+            color: colors.textPrimary,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -283,13 +286,13 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colors.bgSurface,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFD0E1ED)),
+                    border: Border.all(color: colors.borderDefault),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_forward_ios,
-                    color: Color(0xFF1E293B),
+                    color: colors.textPrimary,
                     size: 16,
                   ),
                 ),
@@ -306,7 +309,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // الصورة الرمزية أو الحرف الأول وزر تغيير الصورة
                 Center(
                   child: Column(
                     children: [
@@ -314,9 +316,9 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         width: 84,
                         height: 84,
                         decoration: BoxDecoration(
-                          color: const Color(0xFFD6EEF8),
+                          color: colors.bgSubtle,
                           shape: BoxShape.circle,
-                          border: Border.all(color: const Color(0xFFBAE6FD)),
+                          border: Border.all(color: colors.borderStrong),
                         ),
                         clipBehavior: Clip.antiAlias,
                         child: hasAvatarFile
@@ -327,10 +329,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                             : Center(
                                 child: Text(
                                   initialLetter,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 32,
                                     fontWeight: FontWeight.bold,
-                                    color: Color(0xFF0578B7),
+                                    color: colors.brandBlue,
                                   ),
                                 ),
                               ),
@@ -338,10 +340,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                       const SizedBox(height: 8),
                       TextButton(
                         onPressed: _pickImage,
-                        child: const Text(
+                        child: Text(
                           'تغيير الصورة',
                           style: TextStyle(
-                            color: Color(0xFF0578B7),
+                            color: colors.brandBlue,
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
                           ),
@@ -352,7 +354,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 ),
                 const SizedBox(height: 12),
 
-                // الاسم الكامل
                 _buildFieldLabel('الاسم الكامل'),
                 const SizedBox(height: 8),
                 TextFormField(
@@ -361,8 +362,8 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   onChanged: (_) => setState(() {}),
                   decoration: _inputDecoration(
                     suffixIcon: Icons.person_outline,
-                    fillColor: Colors.white,
-                    borderColor: const Color(0xFFD0E1ED),
+                    fillColor: colors.bgSurface,
+                    borderColor: colors.borderDefault,
                   ),
                   validator: (value) {
                     if (value == null || value.trim().isEmpty) {
@@ -373,7 +374,6 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 ),
                 const SizedBox(height: 16),
 
-                // البريد الإلكتروني (غير قابل للتعديل)
                 _buildFieldLabel('البريد الإلكتروني'),
                 const SizedBox(height: 8),
                 TextFormField(
@@ -381,20 +381,19 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   readOnly: true,
                   enabled: false,
                   textAlign: TextAlign.right,
-                  style: const TextStyle(
-                    color: Color(0xFF94A3B8),
+                  style: TextStyle(
+                    color: colors.textTertiary,
                     fontSize: 14,
                   ),
                   decoration: _inputDecoration(
                     suffixIcon: Icons.mail_outline,
-                    iconColor: const Color(0xFF94A3B8),
-                    fillColor: const Color(0xFFF1F5F9),
-                    borderColor: const Color(0xFFE2E8F0),
+                    iconColor: colors.textTertiary,
+                    fillColor: colors.bgSubtle,
+                    borderColor: colors.borderDefault,
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // رقم الموبايل
                 _buildFieldLabel('رقم الموبايل'),
                 const SizedBox(height: 8),
                 TextFormField(
@@ -403,13 +402,12 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                   textAlign: TextAlign.right,
                   decoration: _inputDecoration(
                     suffixIcon: Icons.phone_outlined,
-                    fillColor: Colors.white,
-                    borderColor: const Color(0xFFD0E1ED),
+                    fillColor: colors.bgSurface,
+                    borderColor: colors.borderDefault,
                   ),
                 ),
                 const SizedBox(height: 16),
 
-                // الجامعة / المعهد
                 _buildFieldLabel('الجامعة / المعهد'),
                 const SizedBox(height: 8),
                 InkWell(
@@ -422,19 +420,19 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         vertical: 14,
                       ),
                       filled: true,
-                      fillColor: Colors.white,
-                      prefixIcon: const Icon(
+                      fillColor: colors.bgSurface,
+                      prefixIcon: Icon(
                         Icons.keyboard_arrow_down,
-                        color: Color(0xFF475569),
+                        color: colors.textSecondary,
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(color: Color(0xFFD0E1ED)),
+                        borderSide: BorderSide(color: colors.borderDefault),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: const BorderSide(
-                          color: Color(0xFF0578B7),
+                        borderSide: BorderSide(
+                          color: colors.brandBlue,
                           width: 1.5,
                         ),
                       ),
@@ -442,39 +440,38 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                     child: Text(
                       _selectedUniversity ?? '',
                       textAlign: TextAlign.right,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14,
-                        color: Color(0xFF0F172A),
+                        color: colors.textPrimary,
                       ),
                     ),
                   ),
                 ),
                 const SizedBox(height: 14),
 
-                // ملاحظة البريد وكلمة المرور
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE0F2FE),
+                    color: colors.statusInfoBg,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
-                    children: const [
+                    children: [
                       Expanded(
                         child: Text(
                           'لا يمكن تغيير البريد الإلكتروني لأنه مرتبط بحسابك. لتغيير كلمة المرور اذهب إلى الإعدادات.',
                           textAlign: TextAlign.right,
                           style: TextStyle(
-                            color: Color(0xFF0578B7),
+                            color: colors.statusInfo,
                             fontSize: 12,
                             height: 1.4,
                           ),
                         ),
                       ),
-                      SizedBox(width: 10),
+                      const SizedBox(width: 10),
                       Icon(
                         Icons.info_outline_rounded,
-                        color: Color(0xFF0578B7),
+                        color: colors.statusInfo,
                         size: 20,
                       ),
                     ],
@@ -482,33 +479,32 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                 ),
                 const SizedBox(height: 28),
 
-                // زر حفظ التغييرات
                 SizedBox(
                   height: 52,
                   child: ElevatedButton(
                     onPressed: _isSaving ? null : _saveChanges,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF0578B7),
+                      backgroundColor: colors.actionPrimary,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
                       elevation: 0,
                     ),
                     child: _isSaving
-                        ? const SizedBox(
+                        ? SizedBox(
                             width: 22,
                             height: 22,
                             child: CircularProgressIndicator(
                               strokeWidth: 2.5,
-                              color: Colors.white,
+                              color: colors.textOnBrand,
                             ),
                           )
-                        : const Text(
+                        : Text(
                             'حفظ التغييرات',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: colors.textOnBrand,
                             ),
                           ),
                   ),
@@ -526,10 +522,10 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     return Text(
       text,
       textAlign: TextAlign.right,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13.5,
         fontWeight: FontWeight.w600,
-        color: Color(0xFF0F172A),
+        color: _colors.textPrimary,
       ),
     );
   }
@@ -538,13 +534,18 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
     required IconData suffixIcon,
     required Color fillColor,
     required Color borderColor,
-    Color iconColor = const Color(0xFF64748B),
+    Color? iconColor,
   }) {
+    final colors = _colors;
     return InputDecoration(
       contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
       filled: true,
       fillColor: fillColor,
-      suffixIcon: Icon(suffixIcon, color: iconColor, size: 20),
+      suffixIcon: Icon(
+        suffixIcon,
+        color: iconColor ?? colors.textSecondary,
+        size: 20,
+      ),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
         borderSide: BorderSide(color: borderColor),
@@ -555,7 +556,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFF0578B7), width: 1.5),
+        borderSide: BorderSide(color: colors.brandBlue, width: 1.5),
       ),
     );
   }

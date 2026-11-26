@@ -1,6 +1,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:it_tools_app/core/theme/app_colors.dart';
+import 'package:it_tools_app/core/theme/theme_extension.dart';
 import 'package:it_tools_app/features/addresses/presentation/widgets/no_orders_view.dart';
 import 'package:it_tools_app/features/profile/presentation/pages/profile_page.dart';
 
@@ -25,9 +27,6 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
   final bool _hasCurrentOrders = false;
   final bool _hasPreviousOrders = false;
 
-  // إظهار الطلبات التجريبية عند الضغط على ابدأ التسوق
-  bool _showDemoOrders = false;
-
   @override
   void initState() {
     super.initState();
@@ -44,26 +43,33 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
     super.dispose();
   }
 
-  // عرض الطلبات التجريبية داخل صفحة طلباتي
   void _handleStartShopping(BuildContext context) {
-    setState(() {
-      _showDemoOrders = true;
-    });
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('سيتم ربط الانتقال إلى الهوم بعد الدمج'),
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF4FBFF),
+      backgroundColor: colors.bgPage,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF4FBFF),
+        backgroundColor: colors.bgPage,
         elevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: false,
         leading: Padding(
           padding: const EdgeInsets.symmetric(
-            horizontal: 12.0,
-            vertical: 8.0,
+            horizontal: 12,
+            vertical: 8,
           ),
           child: Center(
             child: InkWell(
@@ -80,25 +86,23 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
                 width: 38,
                 height: 38,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: colors.bgSurface,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: const Color(0xFFD0E1ED),
-                  ),
+                  border: Border.all(color: colors.borderDefault),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.person_outline_rounded,
-                  color: Color(0xFF0578B7),
+                  color: colors.textPrimary,
                   size: 20,
                 ),
               ),
             ),
           ),
         ),
-        title: const Text(
+        title: Text(
           'طلباتي',
           style: TextStyle(
-            color: Colors.black,
+            color: colors.textPrimary,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -106,7 +110,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
         actions: [
           if (Navigator.canPop(context))
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Center(
                 child: InkWell(
                   onTap: () => Navigator.pop(context),
@@ -115,15 +119,13 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: colors.bgSurface,
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(
-                        color: const Color(0xFFD0E1ED),
-                      ),
+                      border: Border.all(color: colors.borderDefault),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.arrow_forward_ios,
-                      color: Color(0xFF1E293B),
+                      color: colors.textPrimary,
                       size: 16,
                     ),
                   ),
@@ -135,31 +137,33 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
       body: Column(
         children: [
           Container(
-            color: const Color(0xFFF4FBFF),
+            color: colors.bgPage,
             padding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 8,
             ),
             child: Container(
               decoration: BoxDecoration(
-                color: const Color(0xFFE2EEF5),
+                color: colors.bgSubtle,
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: colors.borderDefault),
               ),
               child: TabBar(
                 controller: _tabController,
                 indicator: BoxDecoration(
-                  color: Colors.white,
+                  color: colors.bgSurface,
                   borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: colors.borderDefault),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: colors.overlayScrim.withValues(alpha: 0.08),
                       blurRadius: 4,
                       offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                labelColor: const Color(0xFF0578B7),
-                unselectedLabelColor: Colors.grey,
+                labelColor: colors.textLink,
+                unselectedLabelColor: colors.textTertiary,
                 labelStyle: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
@@ -172,9 +176,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
                 dividerColor: Colors.transparent,
                 tabs: [
                   Tab(
-                    text: (_hasCurrentOrders || _showDemoOrders)
-                        ? 'الحالية (2)'
-                        : 'الحالية',
+                    text: _hasCurrentOrders ? 'الحالية (2)' : 'الحالية',
                   ),
                   const Tab(text: 'السابقة'),
                 ],
@@ -185,8 +187,7 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
             child: TabBarView(
               controller: _tabController,
               children: [
-                // الطلبات الحالية
-                !(_hasCurrentOrders || _showDemoOrders)
+                !_hasCurrentOrders
                     ? NoOrdersView(
                         onStartShopping: () =>
                             _handleStartShopping(context),
@@ -199,8 +200,6 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
                             orderId: '#10482',
                             date: '10 تشرين الثاني 2026 - 3 منتجات',
                             statusText: 'جديد',
-                            statusColor: const Color(0xFFE3F2FD),
-                            textColor: const Color(0xFF1976D2),
                             total: '\$76.50',
                           ),
                           const SizedBox(height: 16),
@@ -209,15 +208,11 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
                             orderId: '#10482',
                             date: '10 تشرين الثاني 2026 - 3 منتجات',
                             statusText: 'قيد التوصيل',
-                            statusColor: const Color(0xFFE8F5E9),
-                            textColor: const Color(0xFF388E3C),
                             total: '\$76.50',
                           ),
                         ],
                       ),
-
-                // الطلبات السابقة
-                !(_hasPreviousOrders || _showDemoOrders)
+                !_hasPreviousOrders
                     ? NoOrdersView(
                         onStartShopping: () =>
                             _handleStartShopping(context),
@@ -230,8 +225,6 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
                             orderId: '#10482',
                             date: '10 تشرين الثاني 2026 - 3 منتجات',
                             statusText: 'مكتمل',
-                            statusColor: const Color(0xFFE8F5E9),
-                            textColor: const Color(0xFF388E3C),
                             total: '\$76.50',
                           ),
                           const SizedBox(height: 16),
@@ -240,8 +233,6 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
                             orderId: '#10482',
                             date: '10 تشرين الثاني 2026 - 3 منتجات',
                             statusText: 'ملغي',
-                            statusColor: const Color(0xFFFFEBEE),
-                            textColor: const Color(0xFFD32F2F),
                             total: '\$76.50',
                           ),
                         ],
@@ -259,10 +250,32 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
     required String orderId,
     required String date,
     required String statusText,
-    required Color statusColor,
-    required Color textColor,
     required String total,
   }) {
+    final colors = context.colors;
+
+    late final Color statusColor;
+    late final Color textColor;
+
+    switch (statusText) {
+      case 'جديد':
+        statusColor = colors.statusInfoBg;
+        textColor = colors.statusInfo;
+        break;
+      case 'قيد التوصيل':
+      case 'مكتمل':
+        statusColor = colors.statusSuccessBg;
+        textColor = colors.statusSuccess;
+        break;
+      case 'ملغي':
+        statusColor = colors.statusDangerBg;
+        textColor = colors.statusDanger;
+        break;
+      default:
+        statusColor = colors.bgSubtle;
+        textColor = colors.textSecondary;
+    }
+
     return InkWell(
       onTap: () {
         Navigator.push(
@@ -275,14 +288,12 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
       borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colors.bgSurface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: const Color(0xFFE2EEF5),
-          ),
+          border: Border.all(color: colors.borderDefault),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.02),
+              color: colors.overlayScrim.withValues(alpha: 0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -316,10 +327,10 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
                   ),
                   Text(
                     'طلب $orderId',
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                      color: colors.textPrimary,
                     ),
                   ),
                 ],
@@ -329,9 +340,9 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
                 alignment: Alignment.centerRight,
                 child: Text(
                   date,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: Colors.grey,
+                    color: colors.textTertiary,
                   ),
                 ),
               ),
@@ -339,18 +350,27 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  _buildProductThumbnail('assets/images/mouse.png'),
+                  _buildProductThumbnail(
+                    'assets/images/mouse.png',
+                    colors,
+                  ),
                   const SizedBox(width: 8),
-                  _buildProductThumbnail('assets/images/keyboard.png'),
+                  _buildProductThumbnail(
+                    'assets/images/keyboard.png',
+                    colors,
+                  ),
                   const SizedBox(width: 8),
-                  _buildProductThumbnail('assets/images/headset.png'),
+                  _buildProductThumbnail(
+                    'assets/images/headset.png',
+                    colors,
+                  ),
                 ],
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(vertical: 14),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 14),
                 child: Divider(
                   height: 1,
-                  color: Color(0xFFF1F5F9),
+                  color: colors.borderDefault,
                 ),
               ),
               Row(
@@ -361,29 +381,27 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              const OrderDetailsPage(),
+                          builder: (context) => const OrderDetailsPage(),
                         ),
                       );
                     },
                     style: TextButton.styleFrom(
                       padding: EdgeInsets.zero,
                       minimumSize: Size.zero,
-                      tapTargetSize:
-                          MaterialTapTargetSize.shrinkWrap,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
-                    child: const Row(
+                    child: Row(
                       children: [
                         Icon(
                           Icons.arrow_back_ios,
                           size: 14,
-                          color: Color(0xFF0578B7),
+                          color: colors.textLink,
                         ),
-                        SizedBox(width: 4),
+                        const SizedBox(width: 4),
                         Text(
                           'التفاصيل',
                           style: TextStyle(
-                            color: Color(0xFF0578B7),
+                            color: colors.textLink,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -395,18 +413,18 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
                     children: [
                       Text(
                         total,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: Colors.black87,
+                          color: colors.textPrimary,
                         ),
                       ),
                       const SizedBox(width: 6),
-                      const Text(
+                      Text(
                         'الإجمالي:',
                         style: TextStyle(
                           fontSize: 13,
-                          color: Colors.grey,
+                          color: colors.textSecondary,
                         ),
                       ),
                     ],
@@ -420,16 +438,17 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
     );
   }
 
-  Widget _buildProductThumbnail(String assetPath) {
+  Widget _buildProductThumbnail(
+    String assetPath,
+    AppColors colors,
+  ) {
     return Container(
       width: 56,
       height: 56,
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FA),
+        color: colors.bgSubtle,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.grey.shade200,
-        ),
+        border: Border.all(color: colors.borderDefault),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(12),
@@ -437,10 +456,10 @@ class _OrdersPageState extends ConsumerState<OrdersPage>
           assetPath,
           fit: BoxFit.contain,
           errorBuilder: (context, error, stackTrace) {
-            return const Icon(
+            return Icon(
               Icons.image_not_supported,
               size: 24,
-              color: Colors.grey,
+              color: colors.textTertiary,
             );
           },
         ),

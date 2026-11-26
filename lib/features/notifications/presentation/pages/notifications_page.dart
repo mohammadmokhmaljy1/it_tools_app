@@ -2,6 +2,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:it_tools_app/core/theme/app_colors.dart';
+import 'package:it_tools_app/core/theme/theme_extension.dart';
 
 enum NotificationSection { today, earlier }
 
@@ -174,22 +176,23 @@ class _NotificationsPageState extends State<NotificationsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     final todayItems =
         _items.where((e) => e.section == NotificationSection.today).toList();
     final earlierItems =
         _items.where((e) => e.section == NotificationSection.earlier).toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4FBFF),
+      backgroundColor: colors.bgPage,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF4FBFF),
+        backgroundColor: colors.bgPage,
         elevation: 0,
         centerTitle: true,
         automaticallyImplyLeading: false,
-        title: const Text(
+        title: Text(
           'الإشعارات',
           style: TextStyle(
-            color: Color(0xFF0F172A),
+            color: colors.textPrimary,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -205,13 +208,13 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   width: 38,
                   height: 38,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colors.bgSurface,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFFD0E1ED)),
+                    border: Border.all(color: colors.borderDefault),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.arrow_forward_ios,
-                    color: Color(0xFF1E293B),
+                    color: colors.textPrimary,
                     size: 16,
                   ),
                 ),
@@ -227,23 +230,23 @@ class _NotificationsPageState extends State<NotificationsPage> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               if (todayItems.isNotEmpty) ...[
-                _buildSectionHeader('اليوم'),
+                _buildSectionHeader('اليوم', colors),
                 const SizedBox(height: 8),
                 ...todayItems.map(
                   (item) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: _buildNotificationCard(item),
+                    child: _buildNotificationCard(item, colors),
                   ),
                 ),
                 const SizedBox(height: 4),
               ],
               if (earlierItems.isNotEmpty) ...[
-                _buildSectionHeader('سابقاً'),
+                _buildSectionHeader('سابقاً', colors),
                 const SizedBox(height: 8),
                 ...earlierItems.map(
                   (item) => Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: _buildNotificationCard(item),
+                    child: _buildNotificationCard(item, colors),
                   ),
                 ),
               ],
@@ -252,27 +255,27 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE0F2FE),
+                  color: colors.statusInfoBg,
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Row(
-                  children: const [
+                  children: [
                     Expanded(
                       child: Text(
                         'نرسل الإشعارات للعروض والكوبونات فقط. تابع حالة طلباتك من صفحة «طلباتي».',
                         textAlign: TextAlign.right,
                         style: TextStyle(
-                          color: Color(0xFF0578B7),
+                          color: colors.statusInfo,
                           fontSize: 12.5,
                           height: 1.45,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Icon(
                       Icons.info_outline_rounded,
-                      color: Color(0xFF0578B7),
+                      color: colors.statusInfo,
                       size: 20,
                     ),
                   ],
@@ -286,28 +289,28 @@ class _NotificationsPageState extends State<NotificationsPage> {
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, AppColors colors) {
     return Text(
       title,
       textAlign: TextAlign.right,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13.5,
         fontWeight: FontWeight.w600,
-        color: Color(0xFF64748B),
+        color: colors.textTertiary,
       ),
     );
   }
 
-  Widget _buildNotificationCard(AppNotificationItem item) {
+  Widget _buildNotificationCard(AppNotificationItem item, AppColors colors) {
     return InkWell(
       onTap: () => _markAsRead(item.id),
       borderRadius: BorderRadius.circular(16),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colors.bgSurface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE2EEF5)),
+          border: Border.all(color: colors.borderDefault),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -318,8 +321,8 @@ class _NotificationsPageState extends State<NotificationsPage> {
                 child: Container(
                   width: 8,
                   height: 8,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFFF59E0B),
+                  decoration: BoxDecoration(
+                    color: colors.statusWarning,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -332,19 +335,19 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   Text(
                     item.title,
                     textAlign: TextAlign.right,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 15,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF0F172A),
+                      color: colors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 6),
                   Text(
                     item.body,
                     textAlign: TextAlign.right,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12.5,
-                      color: Color(0xFF64748B),
+                      color: colors.textSecondary,
                       height: 1.45,
                     ),
                   ),
@@ -352,46 +355,46 @@ class _NotificationsPageState extends State<NotificationsPage> {
                   Text(
                     item.timeAgo,
                     textAlign: TextAlign.right,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 11.5,
-                      color: Color(0xFF94A3B8),
+                      color: colors.textTertiary,
                     ),
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 12),
-            _buildBadgeIcon(item.badgeType),
+            _buildBadgeIcon(item.badgeType, colors),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBadgeIcon(NotificationBadgeType type) {
+  Widget _buildBadgeIcon(NotificationBadgeType type, AppColors colors) {
     Color bgColor;
     Color iconColor;
     IconData iconData;
 
     switch (type) {
       case NotificationBadgeType.gift:
-        bgColor = const Color(0xFFFEF3C7);
-        iconColor = const Color(0xFFD97706);
+        bgColor = colors.statusWarningBg;
+        iconColor = colors.statusWarning;
         iconData = Icons.card_giftcard_rounded;
         break;
       case NotificationBadgeType.flash:
-        bgColor = const Color(0xFFE0F2FE);
-        iconColor = const Color(0xFF0578B7);
+        bgColor = colors.statusInfoBg;
+        iconColor = colors.statusInfo;
         iconData = Icons.bolt_rounded;
         break;
       case NotificationBadgeType.coupon:
-        bgColor = const Color(0xFFE0F2FE);
-        iconColor = const Color(0xFF0578B7);
+        bgColor = colors.statusInfoBg;
+        iconColor = colors.statusInfo;
         iconData = Icons.confirmation_number_outlined;
         break;
       case NotificationBadgeType.shipping:
-        bgColor = const Color(0xFFE0F2FE);
-        iconColor = const Color(0xFF0578B7);
+        bgColor = colors.statusInfoBg;
+        iconColor = colors.statusInfo;
         iconData = Icons.local_shipping_outlined;
         break;
     }

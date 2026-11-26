@@ -29,6 +29,8 @@ class ITToolsApp extends StatelessWidget {
       title: 'IT Tools App',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      themeMode: ThemeMode.system,
       home: const RegisterPage(),
     );
   }

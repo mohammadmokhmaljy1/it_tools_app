@@ -77,6 +77,7 @@ class AppColors extends ThemeExtension<AppColors> {
 
   final Color overlayScrim;
 
+  // Light theme
   static const light = AppColors(
     brandBlue: Color(0xFF0578B7),
     royalBlue: Color(0xFF0543AE),
@@ -112,41 +113,48 @@ class AppColors extends ThemeExtension<AppColors> {
     overlayScrim: Color(0xFF02112C),
   );
 
+  // Dark theme
+   // Dark theme
   static const dark = AppColors(
-    brandBlue: Color(0xFF0D1B2F),
-    royalBlue: Color(0xFF0D1B2F),
-    navy700: Color(0xFF0D1B2F),
-    navy900: Color(0xFF0D1B2F),
-    sky: Color(0xFF0D1B2F),
-    orange: Color(0xFF0D1B2F),
-    ice: Color(0xFF0D1B2F),
-    bgPage: Color(0xFF07111F),
-    bgSurface: Color(0xFF0D1B2F),
-    bgSubtle: Color(0xFF0D1B2F),
-    textPrimary: Color(0xFF0D1B2F),
-    textSecondary: Color(0xFF0D1B2F),
-    textTertiary: Color(0xFF0D1B2F),
-    textOnBrand: Color(0xFF0D1B2F),
-    textOnAccent: Color(0xFF0D1B2F),
-    textLink: Color(0xFF0D1B2F),
-    borderDefault: Color(0xFF0D1B2F),
-    borderStrong: Color(0xFF0D1B2F),
-    borderFocus: Color(0xFF0D1B2F),
-    actionPrimary: Color(0xFF0D1B2F),
-    actionPrimaryPressed: Color(0xFF0D1B2F),
-    actionAccent: Color(0xFF0D1B2F),
-    actionDisabled: Color(0xFF0D1B2F),
-    statusSuccess: Color(0xFF0D1B2F),
-    statusSuccessBg: Color(0xFF0D1B2F),
-    statusDanger: Color(0xFF0D1B2F),
-    statusDangerBg: Color(0xFF0D1B2F),
-    statusWarning: Color(0xFF0D1B2F),
-    statusWarningBg: Color(0xFF0D1B2F),
-    statusInfo: Color(0xFF0D1B2F),
-    statusInfoBg: Color(0xFF0D1B2F),
-    overlayScrim: Color(0xFF07111F),
-  );
+    brandBlue: Color(0xFF279DD6),
+    royalBlue: Color(0xFF6B9CE5),
+    navy700: Color(0xFF244765),
+    navy900: Color(0xFF081727),
+    sky: Color(0xFF83C5F4),
+    orange: Color(0xFFFFB547),
+    ice: Color(0xFF1D3B55),
 
+    bgPage: Color(0xFF081727),
+    bgSurface: Color(0xFF142C43),
+    bgSubtle: Color(0xFF1D3B55),
+
+    textPrimary: Color(0xFFF7FAFF),
+    textSecondary: Color(0xFFD0DCE8),
+    textTertiary: Color(0xFFA5B8CA),
+    textOnBrand: Color(0xFFFFFFFF),
+    textOnAccent: Color(0xFF081727),
+    textLink: Color(0xFF83C5F4),
+
+    borderDefault: Color(0xFF34516B),
+    borderStrong: Color(0xFF52718C),
+    borderFocus: Color(0xFF279DD6),
+
+    actionPrimary: Color(0xFF279DD6),
+    actionPrimaryPressed: Color(0xFF168BC4),
+    actionAccent: Color(0xFFFFB547),
+    actionDisabled: Color(0xFF526579),
+
+    statusSuccess: Color(0xFF65D6A0),
+    statusSuccessBg: Color(0xFF193F35),
+    statusDanger: Color(0xFFFF8585),
+    statusDangerBg: Color(0xFF482B32),
+    statusWarning: Color(0xFFFFC766),
+    statusWarningBg: Color(0xFF493A22),
+    statusInfo: Color(0xFF83C5F4),
+    statusInfoBg: Color(0xFF1D3B55),
+
+    overlayScrim: Color(0xFF000000),
+  );
   @override
   AppColors copyWith({
     Color? brandBlue,
