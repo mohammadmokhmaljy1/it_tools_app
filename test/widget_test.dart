@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -14,11 +16,46 @@ import 'package:it_tools_app/features/checkout/presentation/pages/checkout_page.
 import 'package:it_tools_app/features/onboarding/presentation/providers/app_config_provider.dart';
 import 'package:it_tools_app/features/orders/presentation/pages/orders_page.dart';
 
+import 'package:it_tools_app/features/home/presentation/pages/home_screen.dart';
+import 'package:it_tools_app/features/onboarding/presentation/pages/onboarding_screen.dart';
+
 void main() {
   setUp(() {
     FlutterSecureStorage.setMockInitialValues({});
     SharedPreferences.setMockInitialValues({'onboarding_seen': true});
   });
+
+  for (final seenOnboarding in [false, true]) {
+    testWidgets(
+      'startup uses local onboarding state ($seenOnboarding) while config loads',
+      (tester) async {
+        SharedPreferences.setMockInitialValues({
+          'onboarding_seen': seenOnboarding,
+        });
+        final pendingConfig = Completer<Never>();
+        final container = ProviderContainer(
+          overrides: [
+            appConfigProvider.overrideWith((ref) => pendingConfig.future),
+          ],
+        );
+        addTearDown(container.dispose);
+        await tester.pumpWidget(
+          UncontrolledProviderScope(
+            container: container,
+            child: const ITToolsApp(),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+        await tester.pump(const Duration(seconds: 3));
+        await tester.pumpAndSettle();
+        expect(
+          find.byType(seenOnboarding ? HomeScreen : OnboardingScreen),
+          findsOneWidget,
+        );
+      },
+    );
+  }
 
   testWidgets('ITToolsApp opens login and registration routes', (
     WidgetTester tester,

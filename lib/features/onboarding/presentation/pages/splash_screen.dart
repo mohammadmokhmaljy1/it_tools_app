@@ -30,16 +30,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen> {
       _timerDone = true;
       _navigateIfReady();
     });
-    _loadInitialData();
+    ref.read(appConfigProvider);
+    unawaited(_loadOnboardingState());
   }
 
-  Future<void> _loadInitialData() async {
-    final results = await Future.wait([
-      ref.read(appConfigProvider.future),
-      hasSeenOnboarding(),
-    ]);
+  Future<void> _loadOnboardingState() async {
+    final seenOnboarding = await hasSeenOnboarding();
     if (!mounted) return;
-    _seenOnboarding = results[1] as bool;
+    _seenOnboarding = seenOnboarding;
     _navigateIfReady();
   }
 

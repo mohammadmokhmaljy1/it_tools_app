@@ -40,11 +40,19 @@ final appConfigProvider = FutureProvider<AppConfigEntity?>((ref) async {
 });
 
 Future<bool> hasSeenOnboarding() async {
-  final prefs = await SharedPreferences.getInstance();
-  return prefs.getBool(_onboardingSeenKey) ?? false;
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_onboardingSeenKey) ?? false;
+  } catch (_) {
+    return false;
+  }
 }
 
 Future<void> setOnboardingSeen() async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setBool(_onboardingSeenKey, true);
+  try {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_onboardingSeenKey, true);
+  } catch (_) {
+    // The current visit can continue when preferences are unavailable.
+  }
 }
