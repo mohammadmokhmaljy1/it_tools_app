@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+
 import 'package:it_tools_app/core/theme/app_colors.dart';
 import 'package:it_tools_app/core/theme/app_text_styles.dart';
 
@@ -16,8 +18,19 @@ class CategoryCard extends StatelessWidget {
     required this.onTap,
   });
 
+  Widget _buildFallbackIcon() {
+    return Container(
+      color: const Color(0xFFF4FBFF),
+      child: const Center(
+        child: Icon(Icons.category_outlined, color: AppColors.royal, size: 40),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isNetworkImage = imagePath.startsWith('http');
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -36,20 +49,27 @@ class CategoryCard extends StatelessWidget {
                 ),
                 child: SizedBox(
                   width: double.infinity,
-                  child: Image.asset(
-                    imagePath,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => Container(
-                      color: const Color(0xFFF4FBFF),
-                      child: const Center(
-                        child: Icon(
-                          Icons.image_not_supported_outlined,
-                          color: AppColors.textTertiary,
-                          size: 40,
+                  child: imagePath.isEmpty
+                      ? _buildFallbackIcon()
+                      : isNetworkImage
+                      ? CachedNetworkImage(
+                          imageUrl: imagePath,
+                          memCacheWidth: 300,
+                          fit: BoxFit.cover,
+                          placeholder: (_, _) => const Center(
+                            child: SizedBox(
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          ),
+                          errorWidget: (_, _, _) => _buildFallbackIcon(),
+                        )
+                      : Image.asset(
+                          imagePath,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => _buildFallbackIcon(),
                         ),
-                      ),
-                    ),
-                  ),
                 ),
               ),
             ),

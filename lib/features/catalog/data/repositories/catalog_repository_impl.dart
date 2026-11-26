@@ -1,0 +1,42 @@
+import 'package:it_tools_app/core/utils/result.dart';
+
+import '../../domain/entities/catalog_entities.dart';
+import '../../domain/repositories/catalog_repository.dart';
+import '../datasources/catalog_remote_datasource.dart';
+
+class CatalogRepositoryImpl implements CatalogRepository {
+  final CatalogRemoteDataSource _remoteDataSource;
+
+  const CatalogRepositoryImpl(this._remoteDataSource);
+
+  @override
+  Future<Result<HomeEntity>> getHome() async {
+    final result = await _remoteDataSource.getHome();
+    return switch (result) {
+      Success(:final data) => Success(data.toEntity()),
+      Error(:final failure) => Error(failure),
+    };
+  }
+
+  @override
+  Future<Result<List<CategoryEntity>>> getCategories() async {
+    final result = await _remoteDataSource.getCategories();
+    return switch (result) {
+      Success(:final data) => Success(
+        data.map((model) => model.toEntity()).toList(),
+      ),
+      Error(:final failure) => Error(failure),
+    };
+  }
+
+  @override
+  Future<Result<List<BrandEntity>>> getBrands() async {
+    final result = await _remoteDataSource.getBrands();
+    return switch (result) {
+      Success(:final data) => Success(
+        data.map((model) => model.toEntity()).toList(),
+      ),
+      Error(:final failure) => Error(failure),
+    };
+  }
+}

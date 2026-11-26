@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+
+import 'package:it_tools_app/features/catalog/domain/entities/catalog_entities.dart';
 import 'package:it_tools_app/features/favorites/presentation/widgets/favorites/favorites_mock_data.dart';
 import 'package:it_tools_app/features/home/presentation/widgets/products/product_card.dart';
 
 class HomeProductsGrid extends StatefulWidget {
-  final List<Map<String, dynamic>> products;
+  final List<ProductSummaryEntity> products;
 
   const HomeProductsGrid({super.key, required this.products});
 
@@ -25,8 +27,16 @@ class _HomeProductsGridState extends State<HomeProductsGrid> {
     );
   }
 
+  String _formatUsd(num value) {
+    return value % 1 == 0
+        ? '${value.toInt()}\$'
+        : '${value.toStringAsFixed(1)}\$';
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (widget.products.isEmpty) return const SizedBox.shrink();
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: GridView.builder(
@@ -40,32 +50,40 @@ class _HomeProductsGridState extends State<HomeProductsGrid> {
           childAspectRatio: 0.56,
         ),
         itemBuilder: (context, index) {
-          final item = widget.products[index];
-          final String title = item['title'] as String;
-          final bool isFav = FavoritesMockData.isFavorite(title);
+          final product = widget.products[index];
+          final String priceText = _formatUsd(product.finalPriceUsd);
+          final String? oldPriceText = product.hasDiscount
+              ? _formatUsd(product.priceUsd)
+              : null;
+          final String? discountText = product.discountPercent > 0
+              ? '-${product.discountPercent}%'
+              : product.badgeTitle;
+          final bool isFav = FavoritesMockData.isFavorite(product.name);
 
           return ProductCard(
-            title: title,
-            category: item['category'] as String,
-            price: item['price'] as String,
-            oldPrice: item['oldPrice'] as String?,
-            imageUrl: item['image'] as String,
-            discount: item['discount'] as String?,
+            title: product.name,
+            category: product.brandName,
+            price: priceText,
+            oldPrice: oldPriceText,
+            imageUrl: product.imageUrl,
+            rating: product.ratingAvg.toString(),
+            reviewsCount: product.ratingCount.toString(),
+            discount: discountText,
             isFavorite: isFav,
-            isOutOfStock: (item['isOutOfStock'] as bool?) ?? false,
-            onAddToCart: () => _showAddedToCartSnackBar(title),
+            isOutOfStock: !product.inStock,
+            onAddToCart: () => _showAddedToCartSnackBar(product.name),
             onFavoriteToggle: () {
               setState(() {
                 FavoritesMockData.toggleFavorite({
-                  'name': title,
-                  'category': item['category'],
-                  'price': item['price'],
-                  'oldPrice': item['oldPrice'],
-                  'discount': item['discount'],
-                  'rating': '4.8',
-                  'reviewsCount': '128',
-                  'image': item['image'],
-                  'isAvailable': !((item['isOutOfStock'] as bool?) ?? false),
+                  'name': product.name,
+                  'category': product.brandName,
+                  'price': priceText,
+                  'oldPrice': oldPriceText,
+                  'discount': discountText,
+                  'rating': product.ratingAvg.toString(),
+                  'reviewsCount': product.ratingCount.toString(),
+                  'image': product.imageUrl,
+                  'isAvailable': product.inStock,
                 });
               });
             },

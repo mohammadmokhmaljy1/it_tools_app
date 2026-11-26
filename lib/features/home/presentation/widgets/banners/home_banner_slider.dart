@@ -1,10 +1,13 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-import 'package:it_tools_app/core/constants/app_assets.dart';
 import 'package:it_tools_app/core/theme/app_colors.dart';
+import 'package:it_tools_app/features/catalog/domain/entities/catalog_entities.dart';
 
 class HomeBannerSlider extends StatefulWidget {
-  const HomeBannerSlider({super.key});
+  final List<BannerEntity> banners;
+
+  const HomeBannerSlider({super.key, required this.banners});
 
   @override
   State<HomeBannerSlider> createState() => _HomeBannerSliderState();
@@ -14,9 +17,6 @@ class _HomeBannerSliderState extends State<HomeBannerSlider> {
   final PageController _bannerController = PageController();
   int _currentBannerIndex = 0;
 
-  // قائمة صور البانرات المستخرجة من الفيجما
-  final List<String> _banners = [AppAssets.homeBanner1, AppAssets.homeBanner2];
-
   @override
   void dispose() {
     _bannerController.dispose();
@@ -25,27 +25,50 @@ class _HomeBannerSliderState extends State<HomeBannerSlider> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.banners.isEmpty) return const SizedBox.shrink();
+
     return Column(
       children: [
-        // بانر العروض المتحرك
         SizedBox(
           height: 160,
           child: PageView.builder(
             controller: _bannerController,
-            itemCount: _banners.length,
+            itemCount: widget.banners.length,
             onPageChanged: (index) {
               setState(() {
                 _currentBannerIndex = index;
               });
             },
             itemBuilder: (context, index) {
+              final banner = widget.banners[index];
               return Container(
                 margin: const EdgeInsets.symmetric(horizontal: 2.0),
+                clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(16),
-                  image: DecorationImage(
-                    image: AssetImage(_banners[index]),
-                    fit: BoxFit.cover,
+                  color: AppColors.navy700,
+                ),
+                child: CachedNetworkImage(
+                  imageUrl: banner.imageUrl,
+                  memCacheWidth: 800,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  placeholder: (context, url) => const Center(
+                    child: CircularProgressIndicator(color: Colors.white),
+                  ),
+                  errorWidget: (context, url, error) => Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        banner.title,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontFamily: 'Cairo',
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
               );
@@ -53,12 +76,10 @@ class _HomeBannerSliderState extends State<HomeBannerSlider> {
           ),
         ),
         const SizedBox(height: 12),
-
-        // مؤشر النقاط التفاعلي (Dots)
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: List.generate(
-            _banners.length,
+            widget.banners.length,
             (index) => AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               margin: const EdgeInsets.symmetric(horizontal: 4.0),

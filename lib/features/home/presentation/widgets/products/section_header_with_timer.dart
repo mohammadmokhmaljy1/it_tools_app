@@ -1,55 +1,99 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:it_tools_app/core/theme/app_colors.dart';
 import 'package:it_tools_app/core/theme/app_text_styles.dart';
 
-class SectionHeaderWithTimer extends StatelessWidget {
+class SectionHeaderWithTimer extends StatefulWidget {
   final String title;
+  final DateTime? endsAt;
 
-  const SectionHeaderWithTimer({super.key, this.title = 'عروض اليوم'});
+  const SectionHeaderWithTimer({
+    super.key,
+    this.title = 'عروض اليوم',
+    this.endsAt,
+  });
+
+  @override
+  State<SectionHeaderWithTimer> createState() => _SectionHeaderWithTimerState();
+}
+
+class _SectionHeaderWithTimerState extends State<SectionHeaderWithTimer> {
+  Timer? _ticker;
+  Duration _remaining = Duration.zero;
+
+  @override
+  void initState() {
+    super.initState();
+    _updateRemaining();
+    if (widget.endsAt != null) {
+      _ticker = Timer.periodic(const Duration(seconds: 1), (_) {
+        if (!mounted) return;
+        setState(_updateRemaining);
+      });
+    }
+  }
+
+  void _updateRemaining() {
+    if (widget.endsAt == null) {
+      _remaining = Duration.zero;
+      return;
+    }
+    final diff = widget.endsAt!.toLocal().difference(DateTime.now());
+    _remaining = diff.isNegative ? Duration.zero : diff;
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    super.dispose();
+  }
+
+  String _twoDigits(int value) => value.toString().padLeft(2, '0');
 
   @override
   Widget build(BuildContext context) {
+    final hours = _twoDigits(_remaining.inHours);
+    final minutes = _twoDigits(_remaining.inMinutes.remainder(60));
+    final seconds = _twoDigits(_remaining.inSeconds.remainder(60));
+
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // 1. اليمين: عنوان القسم مع أيقونة البرق المفرغة
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               const Icon(
-                Icons.bolt_outlined, // أيقونة برق مفرغة مطابقة للتصميم
+                Icons.bolt_outlined,
                 size: 22,
-                color: AppColors.orange, // #E39F25
+                color: AppColors.orange,
               ),
               const SizedBox(width: 6),
               Text(
-                title,
+                widget.title,
                 style: const TextStyle(
                   fontFamily: 'Cairo',
                   fontSize: 18,
-                  fontWeight: FontWeight.w600, // SemiBold مطابق لـ Figma
+                  fontWeight: FontWeight.w600,
                   height: 1.5,
                   color: Color(0xFF02112C),
                 ),
               ),
             ],
           ),
-
-          // 2. اليسار: مربعات الوقت الرقمي (08  45  12)
-          // نستخدم LTR للعداد لكي تبقى الساعات 08 على اليمين والثواني 12 على اليسار كما في الصورة
-          const Directionality(
+          Directionality(
             textDirection: TextDirection.ltr,
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                _TimeUnitBox(timeText: '12'),
-                SizedBox(width: 4),
-                _TimeUnitBox(timeText: '45'),
-                SizedBox(width: 4),
-                _TimeUnitBox(timeText: '08'),
+                _TimeUnitBox(timeText: seconds),
+                const SizedBox(width: 4),
+                _TimeUnitBox(timeText: minutes),
+                const SizedBox(width: 4),
+                _TimeUnitBox(timeText: hours),
               ],
             ),
           ),
@@ -71,7 +115,7 @@ class _TimeUnitBox extends StatelessWidget {
       height: 26,
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: AppColors.navy900, // #02112C
+        color: AppColors.navy900,
         borderRadius: BorderRadius.circular(6),
       ),
       child: Text(
