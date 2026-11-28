@@ -6,6 +6,7 @@ import 'package:it_tools_app/core/utils/result.dart';
 
 import '../../domain/entities/product_search_entities.dart';
 import '../models/catalog_models.dart';
+import '../models/product_details_models.dart';
 import '../models/product_search_models.dart';
 
 abstract interface class CatalogRemoteDataSource {
@@ -17,6 +18,8 @@ abstract interface class CatalogRemoteDataSource {
     String q, {
     CancelToken? cancelToken,
   });
+  Future<Result<ProductDetailsModel>> getProductDetails(String idOrSlug);
+  Future<Result<OfferDetailsModel>> getOfferDetails(String offerId);
 }
 
 class CatalogRemoteDataSourceImpl implements CatalogRemoteDataSource {
@@ -107,6 +110,36 @@ class CatalogRemoteDataSourceImpl implements CatalogRemoteDataSource {
       }
 
       return SearchSuggestionsModel.fromJson(rawData);
+    });
+  }
+
+  @override
+  Future<Result<ProductDetailsModel>> getProductDetails(String idOrSlug) {
+    return guardRequest(() async {
+      final response = await _dio.get<Map<String, dynamic>>(
+        '/products/$idOrSlug',
+      );
+      final rawData = response.data?['data'];
+
+      if (rawData is! Map<String, dynamic>) {
+        throw const ServerFailure();
+      }
+
+      return ProductDetailsModel.fromJson(rawData);
+    });
+  }
+
+  @override
+  Future<Result<OfferDetailsModel>> getOfferDetails(String offerId) {
+    return guardRequest(() async {
+      final response = await _dio.get<Map<String, dynamic>>('/offers/$offerId');
+      final rawData = response.data?['data'];
+
+      if (rawData is! Map<String, dynamic>) {
+        throw const ServerFailure();
+      }
+
+      return OfferDetailsModel.fromJson(rawData);
     });
   }
 }

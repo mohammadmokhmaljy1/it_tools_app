@@ -12,6 +12,7 @@ import 'package:it_tools_app/features/categories/presentation/pages/product_list
 import 'package:it_tools_app/features/checkout/presentation/pages/checkout_page.dart';
 import 'package:it_tools_app/features/checkout/presentation/pages/order_success_page.dart';
 import 'package:it_tools_app/features/favorites/presentation/pages/favorites_page.dart';
+import 'package:it_tools_app/features/offers/presentation/pages/offer_details_page.dart';
 import 'package:it_tools_app/features/search/presentation/pages/search_page.dart';
 import 'package:it_tools_app/features/home/presentation/pages/home_screen.dart';
 
@@ -44,6 +45,7 @@ class AppRouter {
   static const String orderSuccess = '/order-success';
   static const String noInternet = '/no-internet';
   static const String productDetails = '/product-details';
+  static const String offerDetails = '/offer-details';
 
   static bool _isOrderPath(String path) =>
       path == orders || path.startsWith('$orders/');
@@ -266,6 +268,17 @@ class AppRouter {
         builder: (context, state) {
           final product = state.extra as Map<String, dynamic>?;
           return ProductDetailsPage(product: product);
+        },
+      ),
+      GoRoute(
+        path: offerDetails,
+        name: 'offer-details',
+        builder: (context, state) {
+          final data = state.extra as Map<String, dynamic>? ?? const {};
+          return OfferDetailsPage(
+            offerId: (data['id'] as String?) ?? '',
+            fallbackTitle: data['title'] as String?,
+          );
         },
       ),
     ],

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:it_tools_app/core/config/app_router.dart';
 
 import 'package:it_tools_app/core/theme/app_colors.dart';
 import 'package:it_tools_app/core/theme/app_text_styles.dart';
@@ -68,6 +70,7 @@ class _ProductListPageState extends ConsumerState<ProductListPage> {
   Map<String, dynamic> _toCardMap(ProductSummaryEntity product) {
     return {
       'id': product.id,
+      'slug': product.slug,
       'name': product.name,
       'category': product.brandName,
       'price': _formatUsd(product.finalPriceUsd),
@@ -214,6 +217,9 @@ class _ProductListPageState extends ConsumerState<ProductListPage> {
               final cardMap = _toCardMap(product);
               return ProductGridCard(
                 product: cardMap,
+                onTap: () =>
+                    context.push(AppRouter.productDetails, extra: cardMap),
+
                 onToggleFavorite: () => setState(() {
                   FavoritesMockData.toggleFavorite(cardMap);
                 }),

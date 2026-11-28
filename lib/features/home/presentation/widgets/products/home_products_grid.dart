@@ -61,6 +61,8 @@ class _HomeProductsGridState extends State<HomeProductsGrid> {
           final bool isFav = FavoritesMockData.isFavorite(product.name);
 
           return ProductCard(
+            productId: product.id,
+            productSlug: product.slug,
             title: product.name,
             category: product.brandName,
             price: priceText,

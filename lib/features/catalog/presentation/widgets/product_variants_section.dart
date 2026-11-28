@@ -1,150 +1,161 @@
 import 'package:flutter/material.dart';
+
 import 'package:it_tools_app/core/theme/app_colors.dart';
 import 'package:it_tools_app/core/theme/app_text_styles.dart';
+import 'package:it_tools_app/features/catalog/domain/entities/product_details_entities.dart';
 
 class ProductVariantsSection extends StatelessWidget {
-  final int selectedColorIndex;
-  final ValueChanged<int> onColorChanged;
-  final String selectedSwitch;
-  final ValueChanged<String> onSwitchChanged;
+  final List<ProductAttributeEntity> attributes;
+  final List<ProductVariantEntity> variants;
+  final Map<String, String> selectedAttributeValues;
+  final void Function(String attributeId, String valueId) onAttributeSelected;
 
   const ProductVariantsSection({
     super.key,
-    required this.selectedColorIndex,
-    required this.onColorChanged,
-    required this.selectedSwitch,
-    required this.onSwitchChanged,
+    required this.attributes,
+    required this.variants,
+    required this.selectedAttributeValues,
+    required this.onAttributeSelected,
   });
 
-  static const List<Map<String, dynamic>> colorOptions = [
-    {'name': 'أسود مطفي', 'color': AppColors.textTertiary},
-    {'name': 'أبيض ثلجي', 'color': AppColors.pageBg},
-    {'name': 'أزرق / أبيض', 'color': AppColors.navy700},
-  ];
+  Color _parseHexColor(String? hex) {
+    if (hex == null || hex.isEmpty) return AppColors.textTertiary;
+    final cleaned = hex.replaceFirst('#', '');
+    if (cleaned.length == 6) {
+      final parsed = int.tryParse('FF$cleaned', radix: 16);
+      if (parsed != null) return Color(parsed);
+    }
+    return AppColors.textTertiary;
+  }
 
-  static const List<Map<String, dynamic>> switchOptions = [
-    {'label': 'Brown', 'desc': 'تكتيلي متوازن · Brown', 'available': true},
-    {'label': 'Blue', 'desc': 'خطّي ومريح للكتابة · Blue', 'available': true},
-    {'label': 'Red', 'desc': 'سريع وخفيف للألعاب · Red', 'available': true},
-    {
-      'label': 'غير متوفر · Silver',
-      'desc': 'غير متوفر حالياً',
-      'available': false,
-    },
-  ];
+  bool _isValueAvailable(String valueId) {
+    if (variants.isEmpty) return true;
+    return variants.any(
+      (v) =>
+          v.attributeValueIds.contains(valueId) && v.inStock && v.stockQty > 0,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final currentColorName = colorOptions[selectedColorIndex]['name'] as String;
-    final currentSwitchDesc =
-        switchOptions.firstWhere(
-              (s) => s['label'] == selectedSwitch,
-              orElse: () => switchOptions[1],
-            )['desc']
-            as String;
+    if (attributes.isEmpty) return const SizedBox.shrink();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 1. قسم اختيار اللون
+        for (int i = 0; i < attributes.length; i++) ...[
+          if (i > 0) const SizedBox(height: 20),
+          _buildAttributeGroup(attributes[i]),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildAttributeGroup(ProductAttributeEntity attribute) {
+    final selectedValueId = selectedAttributeValues[attribute.id];
+    String selectedLabel = '';
+    for (final val in attribute.values) {
+      if (val.id == selectedValueId) {
+        selectedLabel = val.value;
+        break;
+      }
+    }
+
+    final isColor = attribute.displayType == 'color';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('اللون', style: AppTextStyles.titleLarge),
-            Text(
-              currentColorName,
-              style: AppTextStyles.captionStrong.copyWith(
-                color: AppColors.textSecondary,
+            Text(attribute.name, style: AppTextStyles.titleLarge),
+            if (selectedLabel.isNotEmpty)
+              Text(
+                selectedLabel,
+                style: AppTextStyles.captionStrong.copyWith(
+                  color: AppColors.textSecondary,
+                ),
               ),
-            ),
           ],
         ),
         const SizedBox(height: 12),
-        Row(
-          children: List.generate(colorOptions.length, (index) {
-            final bool isSelected = index == selectedColorIndex;
-            final Color circleColor = colorOptions[index]['color'] as Color;
-            return GestureDetector(
-              onTap: () => onColorChanged(index),
-              child: Container(
-                margin: const EdgeInsets.only(left: 12),
-                padding: const EdgeInsets.all(3),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: isSelected ? AppColors.blue : Colors.transparent,
-                    width: 2,
+        if (isColor)
+          Wrap(
+            spacing: 12,
+            runSpacing: 8,
+            children: attribute.values.map((val) {
+              final bool isSelected = val.id == selectedValueId;
+              final bool isAvailable = _isValueAvailable(val.id);
+              final Color circleColor = _parseHexColor(val.colorHex);
+
+              return GestureDetector(
+                onTap: () => onAttributeSelected(attribute.id, val.id),
+                child: Opacity(
+                  opacity: isAvailable ? 1.0 : 0.45,
+                  child: Container(
+                    padding: const EdgeInsets.all(3),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: isSelected ? AppColors.blue : Colors.transparent,
+                        width: 2,
+                      ),
+                    ),
+                    child: Container(
+                      width: 30,
+                      height: 30,
+                      decoration: BoxDecoration(
+                        color: circleColor,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.borderDefault),
+                      ),
+                    ),
                   ),
                 ),
+              );
+            }).toList(),
+          )
+        else
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: attribute.values.map((val) {
+              final bool isSelected = val.id == selectedValueId;
+              final bool isAvailable = _isValueAvailable(val.id);
+
+              return GestureDetector(
+                onTap: () => onAttributeSelected(attribute.id, val.id),
                 child: Container(
-                  width: 30,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    color: circleColor,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.borderDefault),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 9,
                   ),
-                ),
-              ),
-            );
-          }),
-        ),
-        const SizedBox(height: 20),
-
-        // 2. قسم اختيار نوع السويتش
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('نوع السويتش', style: AppTextStyles.titleLarge),
-            Text(
-              currentSwitchDesc,
-              style: AppTextStyles.captionStrong.copyWith(
-                color: AppColors.textSecondary,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Wrap(
-          spacing: 8,
-          runSpacing: 8,
-          children: switchOptions.map((option) {
-            final String label = option['label'] as String;
-            final bool isAvailable = option['available'] as bool;
-            final bool isSelected = label == selectedSwitch;
-
-            return GestureDetector(
-              onTap: isAvailable ? () => onSwitchChanged(label) : null,
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 9,
-                ),
-                decoration: BoxDecoration(
-                  color: isSelected
-                      ? AppColors.blue
-                      : (isAvailable ? AppColors.surface : AppColors.pageBg),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
+                  decoration: BoxDecoration(
                     color: isSelected
                         ? AppColors.blue
-                        : AppColors.borderDefault,
+                        : (isAvailable ? AppColors.surface : AppColors.pageBg),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
+                      color: isSelected
+                          ? AppColors.blue
+                          : AppColors.borderDefault,
+                    ),
+                  ),
+                  child: Text(
+                    isAvailable ? val.value : 'غير متوفر · ${val.value}',
+                    style: AppTextStyles.captionStrong.copyWith(
+                      color: isSelected
+                          ? AppColors.onBrand
+                          : (isAvailable
+                                ? AppColors.textPrimary
+                                : AppColors.textTertiary),
+                    ),
                   ),
                 ),
-                child: Text(
-                  label,
-                  style: AppTextStyles.captionStrong.copyWith(
-                    color: isSelected
-                        ? AppColors.onBrand
-                        : (isAvailable
-                              ? AppColors.textPrimary
-                              : AppColors.textTertiary),
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
+              );
+            }).toList(),
+          ),
       ],
     );
   }

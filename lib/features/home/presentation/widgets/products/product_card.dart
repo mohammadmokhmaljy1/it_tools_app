@@ -18,6 +18,8 @@ class ProductCard extends StatelessWidget {
   final VoidCallback onAddToCart;
   final VoidCallback onFavoriteToggle;
   final bool isFavorite;
+  final String? productId;
+  final String? productSlug;
 
   const ProductCard({
     super.key,
@@ -33,6 +35,8 @@ class ProductCard extends StatelessWidget {
     required this.onAddToCart,
     required this.onFavoriteToggle,
     this.isFavorite = false,
+    this.productId,
+    this.productSlug,
   });
 
   @override
@@ -51,6 +55,8 @@ class ProductCard extends StatelessWidget {
           context.push(
             AppRouter.productDetails,
             extra: {
+              'id': productId,
+              'slug': productSlug,
               'name': title,
               'category': category,
               'price': numericPrice,

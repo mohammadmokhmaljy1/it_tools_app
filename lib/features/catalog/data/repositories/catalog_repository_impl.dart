@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:it_tools_app/core/utils/result.dart';
 
 import '../../domain/entities/catalog_entities.dart';
+import '../../domain/entities/product_details_entities.dart';
 import '../../domain/entities/product_search_entities.dart';
 import '../../domain/repositories/catalog_repository.dart';
 import '../datasources/catalog_remote_datasource.dart';
@@ -63,6 +64,26 @@ class CatalogRepositoryImpl implements CatalogRepository {
       q,
       cancelToken: cancelToken,
     );
+    return switch (result) {
+      Success(:final data) => Success(data.toEntity()),
+      Error(:final failure) => Error(failure),
+    };
+  }
+
+  @override
+  Future<Result<ProductDetailsEntity>> getProductDetails(
+    String idOrSlug,
+  ) async {
+    final result = await _remoteDataSource.getProductDetails(idOrSlug);
+    return switch (result) {
+      Success(:final data) => Success(data.toEntity()),
+      Error(:final failure) => Error(failure),
+    };
+  }
+
+  @override
+  Future<Result<OfferDetailsEntity>> getOfferDetails(String offerId) async {
+    final result = await _remoteDataSource.getOfferDetails(offerId);
     return switch (result) {
       Success(:final data) => Success(data.toEntity()),
       Error(:final failure) => Error(failure),
