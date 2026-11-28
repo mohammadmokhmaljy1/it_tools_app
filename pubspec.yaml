@@ -16,6 +16,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   flutter_screenutil: ^5.9.3
   flutter_svg: ^2.4.0
+  iconsax_flutter: ^1.0.0
 
   # State Management
   flutter_bloc: 9.1.1
@@ -27,7 +28,7 @@ dependencies:
 
   # Dependency Injection
   get_it: 9.3.0
- 
+
 
   # Networking
   dio: 5.11.1
@@ -65,9 +66,10 @@ flutter:
     - assets/images/banners/
     - assets/images/products/
     - assets/icons/
+    - assets/illustrations/
     - assets/images/empty_states/
-  
-  
+
+
   # تعريف الخطوط (Fonts)
   fonts:
     - family: Cairo
@@ -86,4 +88,4 @@ flutter_launcher_icons:
   image_path: "assets/images/logo/logo.png"
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/images/logo/logo.png"
-        
+
