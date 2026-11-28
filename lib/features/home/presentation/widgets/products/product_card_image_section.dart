@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+
 import 'package:it_tools_app/core/theme/app_colors.dart';
 import 'package:it_tools_app/core/theme/app_text_styles.dart';
 
@@ -20,6 +22,8 @@ class ProductCardImageSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isNetworkImage = imageUrl.startsWith('http');
+
     return Stack(
       children: [
         ClipRRect(
@@ -30,22 +34,40 @@ class ProductCardImageSection extends StatelessWidget {
             color: AppColors.pageBg,
             child: Opacity(
               opacity: isOutOfStock ? 0.45 : 1.0,
-              child: Image.asset(
-                imageUrl,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => const Center(
-                  child: Icon(
-                    Icons.image_not_supported_outlined,
-                    color: AppColors.textTertiary,
-                    size: 32,
-                  ),
-                ),
-              ),
+              child: isNetworkImage
+                  ? CachedNetworkImage(
+                      imageUrl: imageUrl,
+                      memCacheWidth: 400,
+                      fit: BoxFit.cover,
+                      placeholder: (_, _) => const Center(
+                        child: SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                      errorWidget: (_, _, _) => const Center(
+                        child: Icon(
+                          Icons.image_not_supported_outlined,
+                          color: AppColors.textTertiary,
+                          size: 32,
+                        ),
+                      ),
+                    )
+                  : Image.asset(
+                      imageUrl,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => const Center(
+                        child: Icon(
+                          Icons.image_not_supported_outlined,
+                          color: AppColors.textTertiary,
+                          size: 32,
+                        ),
+                      ),
+                    ),
             ),
           ),
         ),
-
-        // زر الإضافة للمفضلة (القلب)
         Positioned(
           top: 8,
           left: 8,
@@ -74,8 +96,6 @@ class ProductCardImageSection extends StatelessWidget {
             ),
           ),
         ),
-
-        // وسم الخصم (-20%)
         if (discount != null && !isOutOfStock)
           Positioned(
             top: 8,
@@ -96,8 +116,6 @@ class ProductCardImageSection extends StatelessWidget {
               ),
             ),
           ),
-
-        // نص "غير متوفر حالياً"
         if (isOutOfStock)
           Positioned(
             top: 10,

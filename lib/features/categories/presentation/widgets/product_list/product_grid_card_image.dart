@@ -1,4 +1,6 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+
 import 'package:it_tools_app/core/theme/app_colors.dart';
 import 'package:it_tools_app/core/theme/app_text_styles.dart';
 
@@ -18,8 +20,21 @@ class ProductGridCardImage extends StatelessWidget {
     this.onToggleFavorite,
   });
 
+  Widget _buildFallback() {
+    return const Center(
+      child: Icon(
+        Icons.image_not_supported_outlined,
+        color: AppColors.textTertiary,
+        size: 36,
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final path = imagePath ?? '';
+    final isNetworkImage = path.startsWith('http');
+
     return Stack(
       children: [
         ClipRRect(
@@ -30,17 +45,27 @@ class ProductGridCardImage extends StatelessWidget {
             color: AppColors.pageBg,
             child: Opacity(
               opacity: isAvailable ? 1.0 : 0.45,
-              child: Image.asset(
-                imagePath ?? 'assets/images/products/mouse_silent.png',
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => const Center(
-                  child: Icon(
-                    Icons.image_not_supported_outlined,
-                    color: AppColors.textTertiary,
-                    size: 36,
-                  ),
-                ),
-              ),
+              child: path.isEmpty
+                  ? _buildFallback()
+                  : isNetworkImage
+                  ? CachedNetworkImage(
+                      imageUrl: path,
+                      memCacheWidth: 400,
+                      fit: BoxFit.cover,
+                      placeholder: (_, _) => const Center(
+                        child: SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ),
+                      errorWidget: (_, _, _) => _buildFallback(),
+                    )
+                  : Image.asset(
+                      path,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, _, _) => _buildFallback(),
+                    ),
             ),
           ),
         ),

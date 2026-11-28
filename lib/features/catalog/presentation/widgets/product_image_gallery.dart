@@ -1,5 +1,7 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+
 import 'package:it_tools_app/core/theme/app_colors.dart';
 
 class ProductImageGallery extends StatefulWidget {
@@ -37,15 +39,56 @@ class _ProductImageGalleryState extends State<ProductImageGallery> {
     );
   }
 
+  Widget _buildImage(String path, {required BoxFit fit, int? cacheWidth}) {
+    if (path.startsWith('http')) {
+      return CachedNetworkImage(
+        imageUrl: path,
+        memCacheWidth: cacheWidth,
+        fit: fit,
+        placeholder: (_, _) => const Center(
+          child: SizedBox(
+            width: 24,
+            height: 24,
+            child: CircularProgressIndicator(strokeWidth: 2),
+          ),
+        ),
+        errorWidget: (_, _, _) => const Center(
+          child: Icon(
+            Icons.image_not_supported_outlined,
+            color: AppColors.textTertiary,
+            size: 36,
+          ),
+        ),
+      );
+    }
+    return Image.asset(
+      path,
+      fit: fit,
+      errorBuilder: (_, _, _) => const Center(
+        child: Icon(
+          Icons.image_not_supported_outlined,
+          color: AppColors.textTertiary,
+          size: 36,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final safeImages = widget.images.isEmpty
+        ? ['assets/images/products/keyboard.png']
+        : widget.images;
+    final currentIndex = _selectedIndex >= safeImages.length
+        ? 0
+        : _selectedIndex;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 18),
       decoration: const BoxDecoration(color: AppColors.subtle),
       child: Column(
         children: [
-          // 1. الشريط العلوي: زر الرجوع على اليمين + زر القلب على اليسار
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -68,73 +111,76 @@ class _ProductImageGalleryState extends State<ProductImageGallery> {
             ],
           ),
           const SizedBox(height: 8),
-
-          // 2. الصورة الرئيسية القابلة للسحب
           SizedBox(
             height: 185,
             child: PageView.builder(
               controller: _pageController,
-              itemCount: widget.images.length,
+              itemCount: safeImages.length,
               onPageChanged: (index) => setState(() => _selectedIndex = index),
               itemBuilder: (context, index) {
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: Image.asset(widget.images[index], fit: BoxFit.contain),
+                  child: _buildImage(
+                    safeImages[index],
+                    fit: BoxFit.contain,
+                    cacheWidth: 800,
+                  ),
                 );
               },
             ),
           ),
           const SizedBox(height: 12),
-
-          // 3. نقاط المؤشر في المنتصف
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(widget.images.length, (index) {
-              final bool isActive = index == _selectedIndex;
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                margin: const EdgeInsets.symmetric(horizontal: 3),
-                width: isActive ? 16 : 6,
-                height: 6,
-                decoration: BoxDecoration(
-                  color: isActive ? AppColors.blue : AppColors.borderStrong,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-              );
-            }),
-          ),
-          const SizedBox(height: 14),
-
-          // 4. صف الصور المصغرة الـ 4 في الأسفل
-          // 4. صف الصور المصغرة الـ 4 في الأسفل (بدون مسافة بين الصورة والإطار)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(widget.images.length, (index) {
-              final bool isSelected = index == _selectedIndex;
-              return GestureDetector(
-                onTap: () => _selectImage(index),
-                child: Container(
-                  width: 56,
-                  height: 56,
-                  margin: const EdgeInsets.symmetric(horizontal: 5),
+          if (safeImages.length > 1) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(safeImages.length, (index) {
+                final bool isActive = index == currentIndex;
+                return AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  margin: const EdgeInsets.symmetric(horizontal: 3),
+                  width: isActive ? 16 : 6,
+                  height: 6,
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isSelected
-                          ? AppColors.blue
-                          : AppColors.borderDefault,
-                      width: isSelected ? 2 : 1,
+                    color: isActive ? AppColors.blue : AppColors.borderStrong,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                );
+              }),
+            ),
+            const SizedBox(height: 14),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(safeImages.length, (index) {
+                final bool isSelected = index == currentIndex;
+                return GestureDetector(
+                  onTap: () => _selectImage(index),
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    margin: const EdgeInsets.symmetric(horizontal: 5),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: isSelected
+                            ? AppColors.blue
+                            : AppColors.borderDefault,
+                        width: isSelected ? 2 : 1,
+                      ),
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: _buildImage(
+                        safeImages[index],
+                        fit: BoxFit.cover,
+                        cacheWidth: 200,
+                      ),
                     ),
                   ),
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.asset(widget.images[index], fit: BoxFit.cover),
-                  ),
-                ),
-              );
-            }),
-          ),
+                );
+              }),
+            ),
+          ],
         ],
       ),
     );
