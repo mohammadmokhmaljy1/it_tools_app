@@ -3,7 +3,9 @@ import 'package:share_plus/share_plus.dart';
 import 'package:it_tools_app/core/theme/app_colors.dart';
 import 'package:it_tools_app/core/theme/app_text_styles.dart';
 import 'package:it_tools_app/features/cart/presentation/widgets/cart_items/cart_mock_data.dart';
+import 'package:it_tools_app/features/catalog/presentation/providers/product_details_providers.dart';
 import 'package:it_tools_app/features/catalog/presentation/widgets/product_details_bottom_bar.dart';
+import 'package:it_tools_app/features/catalog/presentation/widgets/product_details_header_section.dart';
 import 'package:it_tools_app/features/catalog/presentation/widgets/product_image_gallery.dart';
 import 'package:it_tools_app/features/catalog/presentation/widgets/product_specs_section.dart';
 import 'package:it_tools_app/features/catalog/presentation/widgets/product_variants_section.dart';
@@ -19,17 +21,16 @@ class ProductDetailsPage extends StatefulWidget {
 
 class _ProductDetailsPageState extends State<ProductDetailsPage> {
   bool _isFavorite = false;
-  int _selectedColorIndex = 2;
-  String _selectedSwitch = 'Blue';
-  int _quantity = 1;
+  late final VariantSelectionController _controller;
 
   String get _name =>
       (widget.product?['name'] as String?) ??
       'كيبورد ميكانيكي 75% لاسلكي بإضاءة RGB';
   String get _category =>
       (widget.product?['category'] as String?) ?? 'كيبورد · Redragon';
-  double get _price => ((widget.product?['price'] ?? 33.60) as num).toDouble();
-  double get _oldPrice =>
+  double get _basePrice =>
+      ((widget.product?['price'] ?? 33.60) as num).toDouble();
+  double get _baseOldPrice =>
       ((widget.product?['oldPrice'] ?? 42.00) as num).toDouble();
   String get _mainImage =>
       (widget.product?['image'] as String?) ??
@@ -42,21 +43,65 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     {'label': 'الضمان', 'value': '6 أشهر من المتجر'},
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    _controller = VariantSelectionController([
+      ProductVariantOption(
+        id: 'v1',
+        sku: 'KB-BLU-BLUE',
+        colorName: 'أزرق / أبيض',
+        switchType: 'Blue',
+        price: _basePrice,
+        oldPrice: _baseOldPrice,
+        stockQty: 5,
+      ),
+      ProductVariantOption(
+        id: 'v2',
+        sku: 'KB-BLK-RED',
+        colorName: 'أسود مطفي',
+        switchType: 'Red',
+        price: _basePrice + 2.0,
+        oldPrice: _baseOldPrice + 2.0,
+        stockQty: 3,
+      ),
+      ProductVariantOption(
+        id: 'v3',
+        sku: 'KB-WHT-BRN',
+        colorName: 'أبيض ثلجي',
+        switchType: 'Brown',
+        price: _basePrice + 1.0,
+        oldPrice: _baseOldPrice + 1.0,
+        stockQty: 4,
+      ),
+      ProductVariantOption(
+        id: 'v4',
+        sku: 'KB-BLU-SLV',
+        colorName: 'أزرق / أبيض',
+        switchType: 'Silver',
+        price: _basePrice,
+        oldPrice: _baseOldPrice,
+        stockQty: 0,
+      ),
+    ]);
+  }
+
   void _addToCart() {
-    final colorName =
-        ProductVariantsSection.colorOptions[_selectedColorIndex]['name']
-            as String;
+    final s = _controller.state;
+    final variant = s.selectedVariant;
+    if (variant == null || !s.canAddToCart) return;
+
     CartMockData.addItem({
       'name': _name,
-      'variant': 'اللون: $colorName · السويتش: $_selectedSwitch',
-      'price': _price,
-      'oldPrice': _oldPrice,
+      'variant': 'اللون: ${s.selectedColor} · السويتش: ${s.selectedSwitch}',
+      'price': variant.price,
+      'oldPrice': variant.oldPrice,
       'image': _mainImage,
-      'quantity': _quantity,
+      'quantity': s.quantity,
     });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('تمت إضافة $_name ($_quantity) إلى السلة'),
+        content: Text('تمت إضافة $_name (${s.quantity}) إلى السلة'),
         backgroundColor: AppColors.navy900,
         duration: const Duration(seconds: 2),
       ),
@@ -65,6 +110,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final s = _controller.state;
+    final variant = s.selectedVariant;
+    final double activePrice = variant?.price ?? _basePrice;
+    final double activeOldPrice = variant?.oldPrice ?? _baseOldPrice;
+    final int stockQty = variant?.stockQty ?? 0;
+    final bool inStock = (variant?.inStock ?? false) && stockQty > 0;
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: SafeArea(
@@ -77,31 +129,38 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 isFavorite: _isFavorite,
                 onToggleFavorite: () =>
                     setState(() => _isFavorite = !_isFavorite),
-                onShare: () {
-                  SharePlus.instance.share(
-                    ShareParams(
-                      text: '$_name - \$${_price.toStringAsFixed(2)}',
-                    ),
-                  );
-                },
+                onShare: () => SharePlus.instance.share(
+                  ShareParams(
+                    text: '$_name - \$${activePrice.toStringAsFixed(2)}',
+                  ),
+                ),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildHeaderAndPrice(),
+                    ProductDetailsHeaderSection(
+                      category: _category,
+                      name: _name,
+                      price: activePrice,
+                      oldPrice: activeOldPrice,
+                      stockQty: stockQty,
+                      inStock: inStock,
+                    ),
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 18),
                       child: Divider(height: 1, color: AppColors.borderDefault),
                     ),
                     ProductVariantsSection(
-                      selectedColorIndex: _selectedColorIndex,
-                      onColorChanged: (i) =>
-                          setState(() => _selectedColorIndex = i),
-                      selectedSwitch: _selectedSwitch,
-                      onSwitchChanged: (s) =>
-                          setState(() => _selectedSwitch = s),
+                      selectedColor: s.selectedColor,
+                      onColorChanged: (c) =>
+                          setState(() => _controller.selectColor(c)),
+                      isColorAvailable: _controller.isColorAvailable,
+                      selectedSwitch: s.selectedSwitch,
+                      onSwitchChanged: (sw) =>
+                          setState(() => _controller.selectSwitch(sw)),
+                      isSwitchAvailable: _controller.isSwitchAvailable,
                     ),
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 20),
@@ -112,33 +171,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       specs: _specs,
                     ),
                     const SizedBox(height: 16),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.subtle,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: AppColors.borderDefault),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(
-                            Icons.star_outline_rounded,
-                            size: 18,
-                            color: AppColors.textSecondary,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              'يمكنك تقييم المنتج بالنجوم بعد استلام طلبك',
-                              style: AppTextStyles.caption.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    _buildRatingNote(),
                   ],
                 ),
               ),
@@ -147,114 +180,43 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
         ),
       ),
       bottomNavigationBar: ProductDetailsBottomBar(
-        quantity: _quantity,
-        onIncrement: () => setState(() => _quantity++),
-        onDecrement: () {
-          if (_quantity > 1) setState(() => _quantity--);
-        },
+        quantity: s.quantity,
+        maxStock: stockQty,
+        inStock: inStock,
+        onIncrement: () => setState(() => _controller.incrementQuantity()),
+        onDecrement: () => setState(() => _controller.decrementQuantity()),
         onAddToCart: _addToCart,
       ),
     );
   }
 
-  Widget _buildHeaderAndPrice() {
-    final String categoryLabel = _category.contains('·')
-        ? _category
-        : '$_category · Redragon';
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              categoryLabel,
+  Widget _buildRatingNote() {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: AppColors.subtle,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.borderDefault),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Icons.star_outline_rounded,
+            size: 18,
+            color: AppColors.textSecondary,
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              'يمكنك تقييم المنتج بالنجوم بعد استلام طلبك',
               style: AppTextStyles.caption.copyWith(
                 color: AppColors.textSecondary,
               ),
             ),
-            Row(
-              children: [
-                const Icon(
-                  Icons.star_rounded,
-                  size: 16,
-                  color: AppColors.orange,
-                ),
-                const SizedBox(width: 4),
-                Text('4.7', style: AppTextStyles.captionStrong),
-                const SizedBox(width: 4),
-                Text('(86 تقييم)', style: AppTextStyles.caption),
-              ],
-            ),
-          ],
-        ),
-        const SizedBox(height: 8),
-        Text(_name, style: AppTextStyles.headingH2),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              '\$${_price.toStringAsFixed(2)}',
-              style: AppTextStyles.priceLarge,
-            ),
-            Row(
-              children: [
-                Text(
-                  '\$${_oldPrice.toStringAsFixed(2)}',
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: AppColors.textTertiary,
-                    decoration: TextDecoration.lineThrough,
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 3,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.orange,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Text(
-                    '-20%',
-                    style: AppTextStyles.captionStrong.copyWith(
-                      color: AppColors.navy900,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-          decoration: BoxDecoration(
-            color: AppColors.successBg,
-            borderRadius: BorderRadius.circular(10),
           ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(
-                Icons.check_circle_outline_rounded,
-                size: 16,
-                color: AppColors.success,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'متوفر · بقي 5 قطع فقط من هذا الخيار',
-                style: AppTextStyles.captionStrong.copyWith(
-                  color: AppColors.success,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

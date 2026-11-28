@@ -4,6 +4,8 @@ import 'package:it_tools_app/core/theme/app_text_styles.dart';
 
 class ProductDetailsBottomBar extends StatelessWidget {
   final int quantity;
+  final int maxStock;
+  final bool inStock;
   final VoidCallback onIncrement;
   final VoidCallback onDecrement;
   final VoidCallback onAddToCart;
@@ -11,6 +13,8 @@ class ProductDetailsBottomBar extends StatelessWidget {
   const ProductDetailsBottomBar({
     super.key,
     required this.quantity,
+    this.maxStock = 99,
+    this.inStock = true,
     required this.onIncrement,
     required this.onDecrement,
     required this.onAddToCart,
@@ -18,6 +22,10 @@ class ProductDetailsBottomBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool canIncrement = inStock && quantity < maxStock;
+    final bool canDecrement = inStock && quantity > 1;
+    final bool canAdd = inStock && maxStock > 0 && quantity > 0;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
       decoration: const BoxDecoration(
@@ -30,7 +38,6 @@ class ProductDetailsBottomBar extends StatelessWidget {
         top: false,
         child: Row(
           children: [
-            // 1. محدد الكمية (+ أزرق / العدد / - فاتح)
             Container(
               height: 50,
               padding: const EdgeInsets.symmetric(horizontal: 6),
@@ -43,9 +50,11 @@ class ProductDetailsBottomBar extends StatelessWidget {
                 children: [
                   _qtyBtn(
                     icon: Icons.add_rounded,
-                    bgColor: AppColors.blue,
-                    iconColor: AppColors.onBrand,
-                    onTap: onIncrement,
+                    bgColor: canIncrement ? AppColors.blue : AppColors.pageBg,
+                    iconColor: canIncrement
+                        ? AppColors.onBrand
+                        : AppColors.textTertiary,
+                    onTap: canIncrement ? onIncrement : null,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -54,38 +63,44 @@ class ProductDetailsBottomBar extends StatelessWidget {
                   _qtyBtn(
                     icon: Icons.remove_rounded,
                     bgColor: AppColors.pageBg,
-                    iconColor: AppColors.textPrimary,
-                    onTap: onDecrement,
+                    iconColor: canDecrement
+                        ? AppColors.textPrimary
+                        : AppColors.textTertiary,
+                    onTap: canDecrement ? onDecrement : null,
                   ),
                 ],
               ),
             ),
             const SizedBox(width: 12),
-
-            // 2. زر أضف إلى السلة الأزرق
             Expanded(
               child: InkWell(
-                onTap: onAddToCart,
+                onTap: canAdd ? onAddToCart : null,
                 borderRadius: BorderRadius.circular(14),
                 child: Container(
                   height: 50,
                   decoration: BoxDecoration(
-                    color: AppColors.actionPrimary,
+                    color: canAdd
+                        ? AppColors.actionPrimary
+                        : AppColors.borderDefault,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
-                        Icons.shopping_cart_outlined,
-                        size: 20,
-                        color: AppColors.onBrand,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'أضف إلى السلة',
-                        style: AppTextStyles.titleMedium.copyWith(
+                      if (canAdd) ...[
+                        const Icon(
+                          Icons.shopping_cart_outlined,
+                          size: 20,
                           color: AppColors.onBrand,
+                        ),
+                        const SizedBox(width: 8),
+                      ],
+                      Text(
+                        canAdd ? 'أضف إلى السلة' : 'غير متوفر حالياً',
+                        style: AppTextStyles.titleMedium.copyWith(
+                          color: canAdd
+                              ? AppColors.onBrand
+                              : AppColors.textTertiary,
                         ),
                       ),
                     ],
@@ -103,7 +118,7 @@ class ProductDetailsBottomBar extends StatelessWidget {
     required IconData icon,
     required Color bgColor,
     required Color iconColor,
-    required VoidCallback onTap,
+    required VoidCallback? onTap,
   }) {
     return InkWell(
       onTap: onTap,
