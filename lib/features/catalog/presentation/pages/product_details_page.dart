@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:it_tools_app/core/theme/app_colors.dart';
 import 'package:it_tools_app/core/theme/app_text_styles.dart';
 import 'package:it_tools_app/features/cart/presentation/widgets/cart_items/cart_mock_data.dart';
@@ -76,6 +77,13 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                 isFavorite: _isFavorite,
                 onToggleFavorite: () =>
                     setState(() => _isFavorite = !_isFavorite),
+                onShare: () {
+                  SharePlus.instance.share(
+                    ShareParams(
+                      text: '$_name - \$${_price.toStringAsFixed(2)}',
+                    ),
+                  );
+                },
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 28),
@@ -103,6 +111,34 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
                       description: 'كيبورد ميكانيكي بحجم 75% مع اتصال لاسلكي 2.4GHz و Bluetooth وسلكي USB-C. إضاءة RGB قابلة للتخصيص، وبطارية تدوم حتى 40 ساعة. مناسب للمبرمجين والطلاب.',
                       specs: _specs,
                     ),
+                    const SizedBox(height: 16),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.subtle,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.borderDefault),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.star_outline_rounded,
+                            size: 18,
+                            color: AppColors.textSecondary,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'يمكنك تقييم المنتج بالنجوم بعد استلام طلبك',
+                              style: AppTextStyles.caption.copyWith(
+                                color: AppColors.textSecondary,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -129,7 +165,6 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // 1. التصنيف على اليمين + النجمة والتقييم على اليسار
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -155,12 +190,8 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
           ],
         ),
         const SizedBox(height: 8),
-
-        // 2. اسم المنتج
         Text(_name, style: AppTextStyles.headingH2),
         const SizedBox(height: 10),
-
-        // 3. السعر الحالي على اليمين + السعر القديم وشارة -20% على اليسار
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -198,10 +229,7 @@ class _ProductDetailsPageState extends State<ProductDetailsPage> {
             ),
           ],
         ),
-
         const SizedBox(height: 12),
-
-        // 4. الشريط الأخضر لحالة التوفر
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
